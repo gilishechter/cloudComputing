@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/styles.css" />
+    <title>Dashboard</title>
+  </head>
+  <body>
+    <header>Welcome to Your Dashboard</header>
+    <div class="container">
+      <h1>Hello, <%= user.username %>!</h1>
+      <ul>
+        <li><a href="/meals/update">Update Meal</a></li>
+        <li><a href="/meals/history">View Meal History</a></li>
+      </ul>
+      <% if (notifications && notifications.length > 0) { %>
+      <h2>Recent Notifications</h2>
+      <ul>
+        <% notifications.forEach(notification => { %>
+        <li><%= notification.message %></li>
+        <% }); %>
+      </ul>
+      <% } %>
+    </div>
+  </body>
+</html>
