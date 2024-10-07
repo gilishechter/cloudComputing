@@ -10,7 +10,10 @@
     <header>Update Your Meal</header>
     <div class="container">
       <h1>Update Meal</h1>
-      <form action="/meals/update" method="POST" enctype="multipart/form-data">
+      <form action="/meals/add" method="POST">
+        <label for="meal_date">Date</label>
+        <input type="datetime-local" id="meal_date" name="meal_date" required />
+
         <label for="mealType">Meal Type</label>
         <select id="mealType" name="mealType" required>
           <option value="breakfast">Breakfast</option>
@@ -18,23 +21,32 @@
           <option value="dinner">Dinner</option>
         </select>
 
-        <label for="date">Date</label>
-        <input type="date" id="date" name="date" required />
-
-        <label for="image">Upload Meal Image</label>
-        <input type="file" id="image" name="image" accept="image/*" required />
+        <label for="image">Meal Image URL</label>
+        <input
+          type="text"
+          id="image"
+          name="image"
+          placeholder="Enter image URL"
+          required
+        />
 
         <label for="description">Description</label>
         <input type="text" id="description" name="description" required />
 
-        <label for="sugarLevel">Measured Sugar Level (after 2 hours)</label>
-        <input type="number" id="sugarLevel" name="sugarLevel" required />
+        <label for="bloodSugar">Blood Sugar Level</label>
+        <input type="number" id="bloodSugar" name="bloodSugar" required />
 
-        <label for="holiday">Is it a holiday?</label>
-        <select id="holiday" name="holiday" required>
+        <label for="foodSugar">Measured Sugar Level (after 2 hours)</label>
+        <input type="number" id="foodSugar" name="foodSugar" required />
+
+        <label for="event">Is it an event?</label>
+        <select id="event" name="event" required>
           <option value="no">No</option>
           <option value="yes">Yes</option>
         </select>
+
+        <label for="UserId">User ID</label>
+        <input type="text" id="UserId" name="UserId" required />
 
         <button type="submit">Submit</button>
       </form>
