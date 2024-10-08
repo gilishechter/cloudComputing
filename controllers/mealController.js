@@ -41,6 +41,13 @@ exports.addMeal = async (req, res) => {
     // מקבל את כתובת התמונה מהשדה החדש
   } = req.body;
 
+  console.log(image);
+  const isFood = await isFoodImage(image); // שליחת ה-buffer של התמונה לבדיקה
+  console.log(isFood);
+  if (!isFood) {
+    return res.status(400).send("The uploaded image is not food.");
+  }
+
   console.log("Request received at /meals/add");
   console.log("Received meal data:", req.body);
 
@@ -122,3 +129,83 @@ exports.getNotificationPage = (req, res) => {
     res.redirect("/login");
   }
 };
+
+const axios = require("axios");
+const got = require("got");
+
+// פונקציה לבדיקת האם התמונה היא של מאכל
+async function isFoodImage(imageFile) {
+  const apiKey = "acc_71eedcb15d2dcfb";
+  const apiSecret = "3558f7524068505d30a5cace9f414f32";
+
+  // ה-URL של התמונה
+  const imageUrl = imageFile;
+  //const imageUrl = encodeURIComponent(imageFile);
+
+  // נקודת הקצה של Imagga ליצירת תגים
+  //const endpoint = "https://api.imagga.com";
+
+  const url =
+    "https://api.imagga.com/v2/tags?image_url=" + encodeURIComponent(imageUrl);
+
+  const getTags = async (imageUrl) => {
+    console.log(imageUrl + "aaaaaa");
+    try {
+      const response = await got(url, {
+        username: apiKey,
+        password: apiSecret,
+      });
+      console.log(response.body + "yes");
+      return JSON.parse(response.body);
+    } catch (error) {
+      console.log(error.response.body + "no");
+    }
+  };
+
+  try {
+    const tags = await getTags(imageUrl); // השתמש ב-await כאן
+    console.log("Tags returned:", tags); // הדפס את התגים שהתקבלו
+
+    const foodTags = [
+      "food",
+      "meal",
+      "dish",
+      "fruit",
+      "vegetable",
+      "dessert",
+      "snack",
+      "breakfast",
+      "lunch",
+      "dinner",
+      "pasta",
+      "hamburger",
+    ];
+
+    if (tags && tags.result && Array.isArray(tags.result.tags)) {
+      // Iterate over each tag
+      for (let tag of tags.result.tags) {
+        console.log(tag);
+        if (tag.confidence >= 70) {
+          console.log(tag.tag.en);
+          if (
+            foodTags.some((foodTag) =>
+              tag.tag.en.toLowerCase().includes(foodTag)
+            )
+          ) {
+            return true; // The image is of food
+          }
+        }
+      }
+    } else {
+      console.error("Tags structure is invalid:", tags);
+      return false; // Handle invalid structure
+    }
+
+    return false; // The image is not of food
+  } catch (error) {
+    console.error("Failed to get tags:", error);
+    return false; // In case of an error, return false
+  }
+}
+
+exports.isFoodImage = isFoodImage;

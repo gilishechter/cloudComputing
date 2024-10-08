@@ -10,7 +10,11 @@
     <header>Update Your Meal</header>
     <div class="container">
       <h1>Update Meal</h1>
-      <form action="/meals/add" method="POST">
+      <form
+        action="/meals/add"
+        method="POST"
+        enctype="application/x-www-form-urlencoded"
+      >
         <label for="meal_date">Date</label>
         <input type="datetime-local" id="meal_date" name="meal_date" required />
 
@@ -23,7 +27,7 @@
 
         <label for="image">Meal Image URL</label>
         <input
-          type="text"
+          type="url"
           id="image"
           name="image"
           placeholder="Enter image URL"

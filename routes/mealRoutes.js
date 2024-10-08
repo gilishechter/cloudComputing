@@ -9,6 +9,8 @@ router.get("/history", mealController.getMealHistoryPage);
 const multer = require("multer");
 const upload = multer();
 
-router.post("/add", upload.none(), mealController.addMeal);
+router.post("/add", mealController.addMeal);
+router.use(express.urlencoded({ extended: true })); // זה מעבד את הנתונים מהטופס
+router.use(express.json()); // זה מעבד JSON, אם יש צורך
 
 module.exports = router;
