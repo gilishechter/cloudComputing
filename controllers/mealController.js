@@ -27,6 +27,60 @@ exports.getMealUpdatePage = (req, res) => {
   }
 };
 
+// פונקציה לבדוק אם התאריך הוא יום מיוחד
+async function checkSpecialEvent(meal_date) {
+  try {
+    // המרת התאריך לפורמט YYYY-MM-DD
+    const formattedDate = meal_date.split("T")[0]; // לוקח את החלק של התאריך לפני ה-T
+    const response = await fetch(
+      `https://www.hebcal.com/hebcal?cfg=json&start=${formattedDate}&end=${formattedDate}&gv=1`
+    );
+
+    if (!response.ok) {
+      console.log("notOk");
+      throw new Error("Network response was not ok");
+    }
+
+    const data = await response.json();
+    const events = data.items; // assuming `data.items` is the list of events
+
+    // בדיקת האם יש אירוע עם תאריך שתואם ל-meal_date
+    for (let event of events) {
+      if (event.date === formattedDate) {
+        console.log(`Found special event: ${event.title}`);
+        return {
+          isSpecial: "yes",
+          eventName: event.title, // שם האירוע
+        };
+      }
+    }
+
+    const dateObject = new Date(formattedDate);
+    const dayOfWeek = dateObject.getDay(); // יום בשבוע (0 = ראשון, 6 = שבת)
+
+    if (dayOfWeek === 6) {
+      console.log("The date falls on Shabbat");
+      return {
+        isSpecial: "yes",
+        eventName: "Shabbat", // ציון שבת כאירוע
+      };
+    }
+
+    // אם לא נמצא אירוע מיוחד
+    console.log("No special event found");
+    return {
+      isSpecial: "no",
+      eventName: "",
+    };
+  } catch (error) {
+    console.error("Error checking special event:", error);
+    return {
+      isSpecial: "no",
+      eventName: "",
+    };
+  }
+}
+
 // הוספת ארוחה חדשה
 exports.addMeal = async (req, res) => {
   const {
@@ -36,19 +90,18 @@ exports.addMeal = async (req, res) => {
     description,
     bloodSugar,
     foodSugar,
-    event,
+    // event,
     // UserId is not needed from req.body anymore
   } = req.body;
 
+  const specialEvent = await checkSpecialEvent(meal_date);
+  console.log(specialEvent.isSpecial);
   console.log(image);
   const isFood = await isFoodImage(image); // Assuming this function checks if the image is food
   console.log(isFood);
   if (!isFood) {
     return res.status(400).send("The uploaded image is not food.");
   }
-
-  console.log("Request received at /meals/add");
-  console.log("Received meal data:", req.body);
 
   if (!req.session.userId) {
     return res.status(401).send("You must be logged in to add a meal.");
@@ -58,7 +111,6 @@ exports.addMeal = async (req, res) => {
 
   try {
     await sql.connect(dbConnectionString);
-    console.log("Connected to database");
 
     const insertQuery = `
       INSERT INTO meals (meal_date, mealType, image, description, bloodSugar, foodSugar, event, UserId)
@@ -72,7 +124,7 @@ exports.addMeal = async (req, res) => {
     insertRequest.input("description", sql.VarChar, description);
     insertRequest.input("bloodSugar", sql.Float, bloodSugar);
     insertRequest.input("foodSugar", sql.Float, foodSugar);
-    insertRequest.input("event", sql.VarChar, event);
+    insertRequest.input("event", sql.VarChar, specialEvent.isSpecial); // שים את התוצאה מהפונקציה כאן
     insertRequest.input("UserId", sql.VarChar, UserId); // Using session UserId
 
     await insertRequest.query(insertQuery);
@@ -84,7 +136,6 @@ exports.addMeal = async (req, res) => {
     res.status(500).send("Error adding meal: " + err.message);
   } finally {
     await sql.close();
-    console.log("Database connection closed");
   }
 };
 
@@ -93,7 +144,6 @@ exports.getMealHistoryPage = async (req, res) => {
   if (req.session.userId) {
     try {
       await sql.connect(dbConnectionString);
-      console.log("Connected to database");
 
       const query = `SELECT * FROM meals WHERE UserId = @UserId`;
       const mealRequest = new sql.Request();
@@ -144,22 +194,18 @@ async function isFoodImage(imageFile) {
     "https://api.imagga.com/v2/tags?image_url=" + encodeURIComponent(imageUrl);
 
   const getTags = async (imageUrl) => {
-    console.log(imageUrl + "aaaaaa");
     try {
       const response = await got(url, {
         username: apiKey,
         password: apiSecret,
       });
-      console.log(response.body + "yes");
+
       return JSON.parse(response.body);
-    } catch (error) {
-      console.log(error.response.body + "no");
-    }
+    } catch (error) {}
   };
 
   try {
     const tags = await getTags(imageUrl); // השתמש ב-await כאן
-    console.log("Tags returned:", tags); // הדפס את התגים שהתקבלו
 
     const foodTags = [
       "food",
@@ -179,7 +225,6 @@ async function isFoodImage(imageFile) {
     if (tags && tags.result && Array.isArray(tags.result.tags)) {
       // Iterate over each tag
       for (let tag of tags.result.tags) {
-        console.log(tag);
         if (tag.confidence >= 70) {
           console.log(tag.tag.en);
           if (
