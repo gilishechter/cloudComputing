@@ -32,7 +32,7 @@ exports.login = async (req, res) => {
     // Check if a user was found
     if (result.recordset.length > 0) {
       // User found, set session and redirect
-      req.session.userId = result.recordset[0].UserId; // Adjust 'UserId' to match your column name
+      req.session.userId = result.recordset[0].ID; // Adjust 'ID' to match your column name
       res.redirect("/users/dashboard");
     } else {
       // No user found, render login page with error message
@@ -108,11 +108,13 @@ exports.getDashboard = async (req, res) => {
 
       // Create a new request
       const request = new sql.Request();
+
+      // Add the userId as a parameter
       request.input("userId", sql.Int, req.session.userId);
 
       // Execute the query to get user data
       const result = await request.query(
-        `SELECT * FROM Users WHERE UserId = @userId`
+        `SELECT * FROM Users WHERE id = @userId`
       );
 
       if (result.recordset.length > 0) {
