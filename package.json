@@ -4,7 +4,8 @@
   "description": "final project",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "author": "gili, adi, ayelet",
   "license": "ISC",
@@ -18,5 +19,6 @@
     "mssql": "^11.0.1",
     "multer": "^1.4.5-lts.1",
     "nodemon": "^3.1.7"
-  }
+  },
+  "keywords": []
 }
