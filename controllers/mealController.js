@@ -37,12 +37,11 @@ exports.addMeal = async (req, res) => {
     bloodSugar,
     foodSugar,
     event,
-    UserId,
-    // מקבל את כתובת התמונה מהשדה החדש
+    // UserId is not needed from req.body anymore
   } = req.body;
 
   console.log(image);
-  const isFood = await isFoodImage(image); // שליחת ה-buffer של התמונה לבדיקה
+  const isFood = await isFoodImage(image); // Assuming this function checks if the image is food
   console.log(isFood);
   if (!isFood) {
     return res.status(400).send("The uploaded image is not food.");
@@ -51,15 +50,11 @@ exports.addMeal = async (req, res) => {
   console.log("Request received at /meals/add");
   console.log("Received meal data:", req.body);
 
-  // Print each parameter individually to check their values
-  console.log("meal_date:", meal_date);
-  console.log("mealType:", mealType);
-  console.log("image:", image);
-  console.log("description:", description);
-  console.log("bloodSugar:", bloodSugar);
-  console.log("foodSugar:", foodSugar);
-  console.log("event:", event);
-  console.log("UserId:", UserId);
+  if (!req.session.userId) {
+    return res.status(401).send("You must be logged in to add a meal.");
+  }
+
+  const UserId = req.session.userId; // Automatically take UserId from session
 
   try {
     await sql.connect(dbConnectionString);
@@ -73,12 +68,12 @@ exports.addMeal = async (req, res) => {
     const insertRequest = new sql.Request();
     insertRequest.input("meal_date", sql.Date, meal_date);
     insertRequest.input("mealType", sql.VarChar, mealType);
-    insertRequest.input("image", sql.VarChar, image); // כאן התמונה היא URL
+    insertRequest.input("image", sql.VarChar, image);
     insertRequest.input("description", sql.VarChar, description);
     insertRequest.input("bloodSugar", sql.Float, bloodSugar);
     insertRequest.input("foodSugar", sql.Float, foodSugar);
     insertRequest.input("event", sql.VarChar, event);
-    insertRequest.input("UserId", sql.VarChar, UserId);
+    insertRequest.input("UserId", sql.VarChar, UserId); // Using session UserId
 
     await insertRequest.query(insertQuery);
     console.log("Meal added successfully");
@@ -102,7 +97,7 @@ exports.getMealHistoryPage = async (req, res) => {
 
       const query = `SELECT * FROM meals WHERE UserId = @UserId`;
       const mealRequest = new sql.Request();
-      mealRequest.input("UserId", sql.Int, req.session.userId);
+      mealRequest.input("UserId", sql.VarChar, req.session.userId);
       const result = await mealRequest.query(query);
 
       const meals = result.recordset;
