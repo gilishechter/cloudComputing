@@ -18,14 +18,4 @@ router.get("/dashboard", userController.getDashboard);
 router.get("/signup", userController.getSignupPage);
 router.post("/signup", userController.signup);
 
-// נתיבים
-router.get("/users/login", userController.getLoginPage);
-router.post("/users/login", userController.login);
-
-router.get("/users/signup", userController.getSignupPage);
-router.post("/users/signup", userController.signup);
-
-router.get("/users/dashboard", userController.getDashboard);
-router.get("/users/logout", userController.logout);
-
 module.exports = router;

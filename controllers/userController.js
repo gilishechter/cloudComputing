@@ -3,7 +3,6 @@ const sql = require("mssql");
 // MSSQL Connection String
 const dbConnectionString =
   "workstation id=lifestyle.mssql.somee.com;packet size=4096;user id=adiitzkovich_SQLLogin_1;pwd=lnc8u82ax8;data source=lifestyle.mssql.somee.com;persist security info=False;initial catalog=lifestyle;TrustServerCertificate=True";
-
 // Route to render the login form
 exports.getLoginPage = (req, res) => {
   const errorMessage = req.session.errorMessage || null;
@@ -26,13 +25,13 @@ exports.login = async (req, res) => {
 
     // Execute the query with parameters
     const result = await request.query(
-      `SELECT * FROM Users WHERE Name = @username AND Password = @password`
+      "SELECT * FROM Users WHERE Name = @username AND Password = @password"
     );
 
     // Check if a user was found
     if (result.recordset.length > 0) {
       // User found, set session and redirect
-      req.session.userId = result.recordset[0].ID; // Adjust 'ID' to match your column name
+      req.session.userId = result.recordset[0].UserId; // Adjust 'ID' to match your column name
       res.redirect("/users/dashboard");
     } else {
       // No user found, render login page with error message
@@ -64,7 +63,7 @@ exports.signup = async (req, res) => {
     const checkRequest = new sql.Request();
     checkRequest.input("name", sql.VarChar, name);
     const checkResult = await checkRequest.query(
-      `SELECT * FROM Users WHERE Name = @name`
+      "SELECT * FROM Users WHERE Name = @name"
     );
 
     if (checkResult.recordset.length > 0) {
@@ -72,7 +71,6 @@ exports.signup = async (req, res) => {
       req.session.errorMessage = "User already exists";
       return res.redirect("/users/signup");
     }
-
     // Insert the new user into the database
     const request = new sql.Request();
     request.input("name", sql.VarChar, name);
@@ -80,7 +78,7 @@ exports.signup = async (req, res) => {
     request.input("userId", sql.VarChar, id); // Assuming id is a string; change to sql.Int if needed
 
     await request.query(
-      `INSERT INTO Users (UserId, Name, Password) VALUES (@userId, @name, @password)`
+      "INSERT INTO Users (UserId, Name, Password) VALUES (@userId, @name, @password)"
     );
 
     // After successful sign up, redirect to the dashboard
@@ -104,25 +102,25 @@ exports.getDashboard = async (req, res) => {
   if (req.session.userId) {
     try {
       // Connect to the database
-      await sql.connect(dbConnectionString);
+      await sql.connect(dbConnectionString); // Replace 'dbConnectionString' with your actual DB connection string
 
-      // Create a new request
+      // Create a prepared statement to avoid SQL injection and properly declare the parameter
       const request = new sql.Request();
 
       // Add the userId as a parameter
-      request.input("userId", sql.Int, req.session.userId);
+      request.input("userId", sql.VarChar, req.session.userId);
 
-      // Execute the query to get user data
+      // Execute the query with the parameter passed correctly
       const result = await request.query(
-        `SELECT * FROM Users WHERE id = @userId`
+        "SELECT * FROM Users WHERE userId = @userId"
       );
 
       if (result.recordset.length > 0) {
-        const user = result.recordset[0]; // User data
+        const user = result.recordset[0]; // Assuming 'user' includes fields like 'username'
 
-        const notifications = []; // Example: Add logic to fetch notifications if needed
+        const notifications = []; // You can add logic to retrieve notifications if necessary
 
-        // Render the dashboard view with user data
+        // Render the dashboard view and pass the user and notifications
         res.render("dashboard", { user, notifications });
       } else {
         res.redirect("/users/login"); // Redirect if no user found
