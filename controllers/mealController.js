@@ -144,14 +144,52 @@ exports.getMealHistoryPage = async (req, res) => {
   if (req.session.userId) {
     try {
       await sql.connect(dbConnectionString);
+      console.log("Connected to database");
 
-      const query = `SELECT * FROM meals WHERE UserId = @UserId`;
+      // Retrieve the filter parameters from the request
+      const { fromDate, toDate, mealType } = req.query;
+
+      // Build the SQL query with conditions for filtering
+      let query = `
+        SELECT meal_date, description, image, bloodSugar, foodSugar, event, mealType 
+        FROM meals 
+        WHERE UserId = @UserId
+      `;
+
+      // Add date filtering if provided
+      if (fromDate) {
+        query += ` AND meal_date >= @FromDate`;
+      }
+      if (toDate) {
+        query += ` AND meal_date <= @ToDate`;
+      }
+
+      // Add mealType filtering if provided and not 'all'
+      if (mealType && mealType !== "all") {
+        query += ` AND mealType = @MealType`;
+      }
+
       const mealRequest = new sql.Request();
       mealRequest.input("UserId", sql.VarChar, req.session.userId);
-      const result = await mealRequest.query(query);
 
+      // Add date inputs to the query if they are provided
+      if (fromDate) {
+        mealRequest.input("FromDate", sql.Date, fromDate);
+      }
+      if (toDate) {
+        mealRequest.input("ToDate", sql.Date, toDate);
+      }
+
+      // Add mealType input if selected
+      if (mealType && mealType !== "all") {
+        mealRequest.input("MealType", sql.VarChar, mealType);
+      }
+
+      const result = await mealRequest.query(query);
       const meals = result.recordset;
-      res.render("meal_history", { meals });
+
+      // Pass the query params along with the meals data
+      res.render("meal_history", { meals, query: req.query });
     } catch (err) {
       console.error("Database fetch error:", err);
       res.status(500).send("Error fetching meal history: " + err.message);
