@@ -231,9 +231,16 @@ exports.getMealHistoryPage = async (req, res) => {
 
       const result = await mealRequest.query(query);
       const meals = result.recordset;
+      const dates = meals.map((meal) => meal.meal_date);
+      const bloodSugarLevels = meals.map((meal) => meal.bloodSugar);
 
       // Pass the query params along with the meals data
-      res.render("meal_history", { meals, query: req.query });
+      res.render("meal_history", {
+        meals,
+        query: req.query,
+        dates,
+        bloodSugarLevels,
+      });
     } catch (err) {
       console.error("Database fetch error:", err);
       res.status(500).send("Error fetching meal history: " + err.message);

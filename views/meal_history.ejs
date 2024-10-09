@@ -4,20 +4,91 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/styles.css" />
-    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <title>Meal History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4; /* צבע רקע כללי */
+        }
+        .container {
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%; /* כל הדף */
+            max-width: 1200px; /* רוחב מקסימלי */
+        }
+        header {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #333; /* צבע טקסט */
+        }
+        form {
+            display: flex;
+            flex-direction: column; /* סידור התוכן בעמודה */
+            align-items: center; /* יישור תוכן במרכז */
+            margin-bottom: 20px;
+        }
+        label {
+            margin: 5px 0;
+        }
+        button {
+            background-color: #2193b0; /* צבע כפתור */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #6dd5ed; /* צבע כפתור בשעת ריחוף */
+        }
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+            padding: 15px;
+            transition: transform 0.2s;
+            width: 250px; /* רוחב כרטיס */
+            position: relative;
+        }
+        .card:hover {
+            transform: scale(1.05); /* אפקט הגדלה כשמחזיקים על הכרטיס */
+        }
+        img {
+            width: 100%;
+            border-radius: 5px;
+        }
+        .chart-container {
+            display: none; /* הגרף מוסתר כברירת מחדל */
+            width: 100%;
+            padding: 10px;
+        }
+        .table-container {
+            width: 100%; /* כל אחד לוקח את כל הרוחב */
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
     <header>Meal History</header>
     <div class="container">
         <h1>Your Meal History</h1>
-        <form action="/meals/history" method="GET">
-          <label for="fromDate">From Date</label>
-          <input type="date" id="fromDate" name="fromDate" value="<%= query.fromDate || '' %>" />
-          
-          <label for="toDate">To Date</label>
-          <input type="date" id="toDate" name="toDate" value="<%= query.toDate || '' %>" />
-          
+        <form action="/meals/history" method="GET" id="filterForm">
+            <label for="fromDate">From Date</label>
+            <input type="date" id="fromDate" name="fromDate" value="<%= query.fromDate || '' %>" />
+
+            <label for="toDate">To Date</label>
+            <input type="date" id="toDate" name="toDate" value="<%= query.toDate || '' %>" />
 
             <label for="mealType">Meal Type</label>
             <select id="mealType" name="mealType">
@@ -28,60 +99,96 @@
             </select>
 
             <button type="submit">Filter</button>
+            <button type="button" id="toggleView">Show Chart</button> <!-- כפתור להחלפת תצוגה -->
         </form>
 
         <% if (meals.length > 0) { %>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Meal Type</th>
-                    <th>Description</th>
-                    <th>Image</th>
-                    <th>Blood Sugar</th>
-                    <th>Food Sugar</th>
-                    <th>Event</th>
-                </tr>
-            </thead>
-            <tbody>
+        <div class="table-container"> <!-- הטבלה מוצגת כברירת מחדל -->
+            <div style="display: flex; flex-wrap: wrap; justify-content: center;">
                 <% meals.forEach(meal => { %>
-                <tr>
-                    <td class="date"><%= meal.meal_date %></td>
-                    <td><%= meal.mealType %></td>
-                    <td><%= meal.description %></td>
-                    <td><img src="<%= meal.image %>" alt="Meal Image" style="width:50px; height:50px;" /></td>
-                    <td><%= meal.bloodSugar %></td>
-                    <td><%= meal.foodSugar %></td>
-                    <td><%= meal.event %></td>
-                </tr>
+                <div class="card">
+                    <img src="<%= meal.image %>" alt="Meal Image" />
+                    <h3><%= meal.mealType %></h3>
+                    <p>Date: <%= meal.meal_date %></p>
+                    <p>Description: <%= meal.description %></p>
+                    <p>Blood Sugar: <%= meal.bloodSugar %></p>
+                    <p>Food Sugar: <%= meal.foodSugar %></p>
+                    <p>Event: <%= meal.event %></p>
+                </div>
                 <% }); %>
-            </tbody>
-        </table>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2>Blood Sugar Levels Chart</h2>
+            <canvas id="bloodSugarChart" width="400" height="200"></canvas>
+        </div>
         <% } else { %>
         <p>No meals found.</p>
         <% } %>
     </div>
+    
 
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const fromDateInput = document.getElementById('fromDate');
-        const toDateInput = document.getElementById('toDate');
-    
-        function setDateToEnglishFormat(input) {
-          const date = new Date(input.value);
-          const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-          input.value = date.toLocaleDateString('en-US', options);
-        }
-    
-        fromDateInput.addEventListener('focusout', function() {
-          setDateToEnglishFormat(fromDateInput);
+        document.getElementById('toggleView').addEventListener('click', function() {
+            const tableContainer = document.querySelector('.table-container');
+            const chartContainer = document.querySelector('.chart-container');
+            if (tableContainer.style.display === 'block') {
+                tableContainer.style.display = 'none';
+                chartContainer.style.display = 'block';
+                this.textContent = 'Show Table';
+                renderChart(); // קריאה לפונקציה לצייר את הגרף
+            } else {
+                tableContainer.style.display = 'block';
+                chartContainer.style.display = 'none';
+                this.textContent = 'Show Chart';
+            }
         });
-    
-        toDateInput.addEventListener('focusout', function() {
-          setDateToEnglishFormat(toDateInput);
+
+        document.getElementById('filterForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // ביטול שליחת הטופס
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+            const mealType = document.getElementById('mealType').value;
+
+            // שליחת הנתונים לסינון (שימוש ב-fetch או כל שיטה אחרת)
+            fetch(`/meals/history?fromDate=${fromDate}&toDate=${toDate}&mealType=${mealType}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.body.innerHTML = html; // החלפת התוכן עם התגובה
+                    // כאן ניתן להוסיף לוגיקה מחדש לגרף והכפתורים
+                });
         });
-      });
+
+        // קבלת הנתונים מהטבלה
+        const meals = <%- JSON.stringify(meals) %>; // הנחת שהמילה meals זמינה
+
+        const dates = meals.map(meal => meal.meal_date); // רשימת התאריכים
+        const bloodSugarLevels = meals.map(meal => meal.bloodSugar); // רשימת רמות הסוכר
+
+        // יצירת הגרף
+        const ctx = document.getElementById('bloodSugarChart').getContext('2d');
+        const bloodSugarChart = new Chart(ctx, {
+            type: 'line', // סוג הגרף - קו
+            data: {
+                labels: dates, // תאריכים על ציר ה-X
+                datasets: [{
+                    label: 'רמת סוכר בדם', // תווית של סדרת הנתונים
+                    data: bloodSugarLevels, // רמות סוכר
+                    borderColor: 'rgba(75, 192, 192, 1)', // צבע קו
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)', // צבע הרקע
+                    fill: true // למלא את האזור מתחת לקו
+                }]
+            },
+            options: {
+                responsive: true, // גרף מגיב
+                scales: {
+                    y: {
+                        beginAtZero: true // להתחיל את ציר ה-Y מ-0
+                    }
+                }
+            }
+        });
     </script>
-    
 </body>
 </html>
