@@ -14,32 +14,32 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            background-color: #f4f4f4; /* צבע רקע כללי */
+            background-color: #f4f4f4;
         }
         .container {
             margin: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 100%; /* כל הדף */
-            max-width: 1200px; /* רוחב מקסימלי */
+            width: 100%;
+            max-width: 1200px;
         }
         header {
             font-size: 2em;
             margin-bottom: 20px;
-            color: #333; /* צבע טקסט */
+            color: #333;
         }
         form {
             display: flex;
-            flex-direction: column; /* סידור התוכן בעמודה */
-            align-items: center; /* יישור תוכן במרכז */
+            flex-direction: column;
+            align-items: center;
             margin-bottom: 20px;
         }
         label {
             margin: 5px 0;
         }
         button {
-            background-color: #2193b0; /* צבע כפתור */
+            background-color: #2193b0;
             color: white;
             border: none;
             border-radius: 5px;
@@ -49,7 +49,7 @@
             margin-top: 10px;
         }
         button:hover {
-            background-color: #6dd5ed; /* צבע כפתור בשעת ריחוף */
+            background-color: #6dd5ed;
         }
         .card {
             background: #fff;
@@ -58,23 +58,23 @@
             margin: 10px;
             padding: 15px;
             transition: transform 0.2s;
-            width: 250px; /* רוחב כרטיס */
+            width: 250px;
             position: relative;
         }
         .card:hover {
-            transform: scale(1.05); /* אפקט הגדלה כשמחזיקים על הכרטיס */
+            transform: scale(1.05);
         }
         img {
             width: 100%;
             border-radius: 5px;
         }
         .chart-container {
-            display: none; /* הגרף מוסתר כברירת מחדל */
+            display: none;
             width: 100%;
             padding: 10px;
         }
         .table-container {
-            width: 100%; /* כל אחד לוקח את כל הרוחב */
+            width: 100%;
             padding: 10px;
         }
     </style>
@@ -99,17 +99,17 @@
             </select>
 
             <button type="submit">Filter</button>
-            <button type="button" id="toggleView">Show Chart</button> <!-- כפתור להחלפת תצוגה -->
+            <button type="button" id="toggleView">Show Chart</button>
         </form>
 
         <% if (meals.length > 0) { %>
-        <div class="table-container"> <!-- הטבלה מוצגת כברירת מחדל -->
+        <div class="table-container">
             <div style="display: flex; flex-wrap: wrap; justify-content: center;">
                 <% meals.forEach(meal => { %>
                 <div class="card">
                     <img src="<%= meal.image %>" alt="Meal Image" />
                     <h3><%= meal.mealType %></h3>
-                    <p>Date: <%= meal.meal_date %></p>
+                    <p>Date: <%= formatDate(meal.meal_date) %></p>
                     <p>Description: <%= meal.description %></p>
                     <p>Blood Sugar: <%= meal.bloodSugar %></p>
                     <p>Food Sugar: <%= meal.foodSugar %></p>
@@ -127,7 +127,6 @@
         <p>No meals found.</p>
         <% } %>
     </div>
-    
 
     <script>
         document.getElementById('toggleView').addEventListener('click', function() {
@@ -137,7 +136,7 @@
                 tableContainer.style.display = 'none';
                 chartContainer.style.display = 'block';
                 this.textContent = 'Show Table';
-                renderChart(); // קריאה לפונקציה לצייר את הגרף
+                renderChart();
             } else {
                 tableContainer.style.display = 'block';
                 chartContainer.style.display = 'none';
@@ -146,45 +145,41 @@
         });
 
         document.getElementById('filterForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // ביטול שליחת הטופס
+            event.preventDefault();
             const fromDate = document.getElementById('fromDate').value;
             const toDate = document.getElementById('toDate').value;
             const mealType = document.getElementById('mealType').value;
 
-            // שליחת הנתונים לסינון (שימוש ב-fetch או כל שיטה אחרת)
             fetch(`/meals/history?fromDate=${fromDate}&toDate=${toDate}&mealType=${mealType}`)
                 .then(response => response.text())
                 .then(html => {
-                    document.body.innerHTML = html; // החלפת התוכן עם התגובה
-                    // כאן ניתן להוסיף לוגיקה מחדש לגרף והכפתורים
+                    document.body.innerHTML = html;
                 });
         });
 
-        // קבלת הנתונים מהטבלה
-        const meals = <%- JSON.stringify(meals) %>; // הנחת שהמילה meals זמינה
+        const meals = <%- JSON.stringify(meals) %>;
 
-        const dates = meals.map(meal => meal.meal_date); // רשימת התאריכים
-        const bloodSugarLevels = meals.map(meal => meal.bloodSugar); // רשימת רמות הסוכר
+        const dates = meals.map(meal => meal.meal_date.split("T")[0]);
+        const bloodSugarLevels = meals.map(meal => meal.bloodSugar);
 
-        // יצירת הגרף
         const ctx = document.getElementById('bloodSugarChart').getContext('2d');
         const bloodSugarChart = new Chart(ctx, {
-            type: 'line', // סוג הגרף - קו
+            type: 'line',
             data: {
-                labels: dates, // תאריכים על ציר ה-X
+                labels: dates,
                 datasets: [{
-                    label: 'רמת סוכר בדם', // תווית של סדרת הנתונים
-                    data: bloodSugarLevels, // רמות סוכר
-                    borderColor: 'rgba(75, 192, 192, 1)', // צבע קו
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)', // צבע הרקע
-                    fill: true // למלא את האזור מתחת לקו
+                    label: 'Blood Sugar Level',
+                    data: bloodSugarLevels,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true
                 }]
             },
             options: {
-                responsive: true, // גרף מגיב
+                responsive: true,
                 scales: {
                     y: {
-                        beginAtZero: true // להתחיל את ציר ה-Y מ-0
+                        beginAtZero: true
                     }
                 }
             }

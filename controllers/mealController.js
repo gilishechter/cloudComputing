@@ -184,6 +184,7 @@ async function checkSpecialEvent(meal_date) {
   }
 }
 // Display meal history page
+// Display meal history page
 exports.getMealHistoryPage = async (req, res) => {
   if (req.session.userId) {
     try {
@@ -240,6 +241,7 @@ exports.getMealHistoryPage = async (req, res) => {
         query: req.query,
         dates,
         bloodSugarLevels,
+        formatDate: formatDate,
       });
     } catch (err) {
       console.error("Database fetch error:", err);
@@ -332,6 +334,14 @@ async function isFoodImage(imageFile) {
     console.error("Failed to get tags:", error);
     return false; // In case of an error, return false
   }
+}
+
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // חודשים מתחילים מ-0
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
 }
 
 exports.isFoodImage = isFoodImage;
