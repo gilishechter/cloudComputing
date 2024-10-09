@@ -13,9 +13,17 @@ body {
 header {
   background-color: #007bff;
   color: white;
-  text-align: center;
+  text-align: left; /* ממרכז את הטקסט לצד שמאל */
   padding: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex; /* מאפשר שימוש ב-Flexbox */
+  align-items: center; /* ממרכז את התמונה והמלל במרחק שווה */
+}
+
+.logo {
+  width: 200px; /* הגדר רוחב גדול יותר לתמונה */
+  height: auto; /* גובה אוטומטי לשמירה על הפרופורציות */
+  margin-right: 20px; /* מרווח בין התמונה לטקסט */
 }
 
 .container {
