@@ -44,7 +44,7 @@
         text-decoration: none;
         font-size: 18px;
         transition: color 0.3s ease;
-        position: relative; /* הכנה למיקום הבועה */
+        position: relative;
       }
 
       nav .menu a:hover {
@@ -52,22 +52,21 @@
       }
 
       .tooltip {
-        display: none; /* התחל עם הסתרת הטקסט */
+        display: none;
         position: absolute;
-        background-color: rgba(173, 216, 230, 0.9); /* תכלת לבן */
+        background-color: rgba(173, 216, 230, 0.9);
         color: #333;
         padding: 10px;
         border-radius: 5px;
         z-index: 1000;
-        margin-top: 5px; /* רווח מעל הטקסט */
-        left: 80%; /* מיקום יותר ימינה */
-        transform: translateX(-50%); /* למרכז את הבועה */
-        white-space: normal; /* מאפשר טקסט לעבור לשורה הבאה */
-        width: 250px; /* רוחב קבוע */
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* הצללה */
+        margin-top: 5px;
+        left: 80%;
+        transform: translateX(-50%);
+        white-space: normal;
+        width: 250px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       }
 
-      /* הצג את הבועה כשעומדים על ה-about */
       nav .menu a:hover + .tooltip {
         display: block;
       }
@@ -83,7 +82,7 @@
         margin-bottom: 30px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       }
-      
+
       .container {
         background-color: white;
         border-radius: 15px;
@@ -93,7 +92,7 @@
         max-width: 600px;
         animation: fadeIn 1s ease-out;
         position: relative;
-        margin-top: 120px; /* הורדת רווח עליון לטופס */
+        margin-top: 120px;
       }
 
       @keyframes fadeIn {
@@ -202,8 +201,6 @@
       <div class="logo">SugarWize</div>
       <img src="/images/logo.png" alt="Health App Logo" style="height: 40px" />
       <div class="menu">
-      <div class="menu">
-        
         <a href="/users/dashboard">Home</a>
         <a href="#" id="about-link">About</a>
         <span class="tooltip"
@@ -226,6 +223,7 @@
         action="/meals/add"
         method="POST"
         enctype="application/x-www-form-urlencoded"
+        id="mealForm"
       >
         <label for="meal_date">Date</label>
         <input type="datetime-local" id="meal_date" name="meal_date" required />
@@ -257,11 +255,51 @@
         <label for="bloodSugar">Blood Sugar Level</label>
         <input type="number" id="bloodSugar" name="bloodSugar" required />
 
-        <label for="foodSugar">Measured Sugar Level (after 2 hours)</label>
-        <input type="number" id="foodSugar" name="foodSugar" required />
-
         <button type="submit">Submit</button>
       </form>
     </div>
+
+    <script>
+      document
+        .getElementById("mealForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault(); // למנוע שליחת טופס רגילה
+
+          const formData = new FormData(this);
+
+          try {
+            // שליחת הנתונים לשרת
+            const response = await fetch("/meals/add", {
+              method: "POST",
+              body: new URLSearchParams(formData),
+            });
+
+            const contentType = response.headers.get("content-type");
+            let result;
+
+            if (contentType && contentType.includes("application/json")) {
+              result = await response.json(); // הנחה שהשרת מחזיר תשובה כ-JSON
+
+              if (result.success) {
+                // הצגת החלונית הקופצת עם הערך שחוזה
+                alert(
+                  `The predicted blood sugar level is: ${result.predictedBloodSugar}`
+                );
+
+                // מעבר למסך ההיסטוריה
+                window.location.href = "/meals/history"; // עדכן ל-URL של מסך ההיסטוריה
+              } else {
+                alert("Failed to update meal. Please try again.");
+              }
+            } else {
+              const text = await response.text(); // לקבל את התגובה כטקסט אם לא JSON
+              alert(`Error: ${text}`);
+            }
+          } catch (err) {
+            console.error("Error submitting meal:", err);
+            alert("An error occurred while submitting the meal.");
+          }
+        });
+    </script>
   </body>
 </html>

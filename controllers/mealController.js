@@ -59,23 +59,17 @@ async function getFoodSugarFromUSDA(foodName) {
 const upload = multer({ storage: storage });
 
 // הוספת ארוחה חדשה
+const { predictBloodSugar } = require("../services/blood-sugar-prediction");
+
 exports.addMeal = async (req, res) => {
-  const {
-    meal_date,
-    mealType,
-    image,
-    description,
-    bloodSugar,
-    // foodSugar,
-    // event,
-    // UserId is not needed from req.body anymore
-  } = req.body;
+  const { meal_date, mealType, image, description } = req.body;
 
   const specialEvent = await checkSpecialEvent(meal_date);
   console.log(specialEvent.isSpecial);
   console.log(image);
   const isFood = await isFoodImage(image); // Assuming this function checks if the image is food
   console.log(isFood);
+
   if (!isFood) {
     return res.status(400).send("The uploaded image is not food.");
   }
@@ -83,6 +77,7 @@ exports.addMeal = async (req, res) => {
   if (!req.session.userId) {
     return res.status(401).send("You must be logged in to add a meal.");
   }
+
   const foodSugar = await getFoodSugarFromUSDA(description);
   if (!foodSugar) {
     return res
@@ -91,6 +86,11 @@ exports.addMeal = async (req, res) => {
   }
 
   const UserId = req.session.userId; // Automatically take UserId from session
+
+  // חיזוי רמת הסוכר בדם
+  const newSugarContent = { sugarContent: foodSugar }; // הכנס את כמות הסוכר החדשה
+  const bloodSugar = await predictBloodSugar(newSugarContent);
+  console.log(newSugarContent);
 
   try {
     await sql.connect(dbConnectionString);
@@ -113,7 +113,8 @@ exports.addMeal = async (req, res) => {
     await insertRequest.query(insertQuery);
     console.log("Meal added successfully");
 
-    res.redirect("/meals/history");
+    // כאן מחזירים את התגובה כ-JSON
+    res.json({ success: true, predictedBloodSugar: bloodSugar });
   } catch (err) {
     console.error("Database insert error:", err);
     res.status(500).send("Error adding meal: " + err.message);
@@ -121,6 +122,7 @@ exports.addMeal = async (req, res) => {
     await sql.close();
   }
 };
+
 // Route for rendering the update meal page
 exports.getMealUpdatePage = (req, res) => {
   if (req.session.userId) {
