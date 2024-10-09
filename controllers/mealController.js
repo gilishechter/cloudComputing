@@ -61,13 +61,16 @@ const upload = multer({ storage: storage });
 // הוספת ארוחה חדשה
 const { predictBloodSugar } = require("../services/blood-sugar-prediction");
 
+const moment = require("moment-timezone");
+
 exports.addMeal = async (req, res) => {
   const { meal_date, mealType, image, description } = req.body;
 
   const specialEvent = await checkSpecialEvent(meal_date);
   console.log(specialEvent.isSpecial);
   console.log(image);
-  const isFood = await isFoodImage(image); // Assuming this function checks if the image is food
+
+  const isFood = await isFoodImage(image);
   console.log(isFood);
 
   if (!isFood) {
@@ -85,15 +88,20 @@ exports.addMeal = async (req, res) => {
       .send("Unable to retrieve sugar information for the food.");
   }
 
-  const UserId = req.session.userId; // Automatically take UserId from session
+  const UserId = req.session.userId;
 
-  // חיזוי רמת הסוכר בדם
-  const newSugarContent = { sugarContent: foodSugar }; // הכנס את כמות הסוכר החדשה
+  const newSugarContent = { sugarContent: foodSugar };
   const bloodSugar = await predictBloodSugar(newSugarContent);
   console.log(newSugarContent);
 
   try {
     await sql.connect(dbConnectionString);
+
+    // המרת התאריך לאזור זמן ירושלים
+    const localMealDate = moment(meal_date)
+      .tz("Asia/Jerusalem")
+      .format("YYYY-MM-DDTHH:mm:ss");
+    console.log("Local date to be inserted:", localMealDate);
 
     const insertQuery = `
       INSERT INTO meals (meal_date, mealType, image, description, bloodSugar, foodSugar, event, UserId)
@@ -101,19 +109,18 @@ exports.addMeal = async (req, res) => {
     `;
 
     const insertRequest = new sql.Request();
-    insertRequest.input("meal_date", sql.Date, meal_date);
+    insertRequest.input("meal_date", sql.VarChar, localMealDate); // שלח כ-string
     insertRequest.input("mealType", sql.VarChar, mealType);
     insertRequest.input("image", sql.VarChar, image);
     insertRequest.input("description", sql.VarChar, description);
     insertRequest.input("bloodSugar", sql.Float, bloodSugar);
     insertRequest.input("foodSugar", sql.Float, foodSugar);
-    insertRequest.input("event", sql.VarChar, specialEvent.isSpecial); // שים את התוצאה מהפונקציה כאן
-    insertRequest.input("UserId", sql.VarChar, UserId); // Using session UserId
+    insertRequest.input("event", sql.VarChar, specialEvent.isSpecial);
+    insertRequest.input("UserId", sql.VarChar, UserId);
 
     await insertRequest.query(insertQuery);
     console.log("Meal added successfully");
 
-    // כאן מחזירים את התגובה כ-JSON
     res.json({ success: true, predictedBloodSugar: bloodSugar });
   } catch (err) {
     console.error("Database insert error:", err);
