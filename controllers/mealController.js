@@ -1,6 +1,10 @@
 const sql = require("mssql");
 const multer = require("multer");
 const path = require("path");
+const axios = require("axios");
+const got = require("got");
+
+const usdaApiKey = "HNqNjAecPRHVpqTPSiiVmJmw6RP1OEKNigeyGyBc";
 
 // MSSQL Connection String
 const dbConnectionString =
@@ -16,8 +20,107 @@ const storage = multer.diskStorage({
   },
 });
 
+async function getFoodSugarFromUSDA(foodName) {
+  const urlA = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${usdaApiKey}&query=${foodName}`;
+  console.log("Sending API request to USDA:", urlA); // הדפסה לבדיקת ה-URL
+
+  try {
+    const response = await axios.get(urlA);
+    const foods = response.data.foods;
+
+    if (foods.length > 0) {
+      const nutrients = foods[0].foodNutrients; // יש לשים לב שלפעמים יהיו מספר תוצאות לאותו שם אוכל
+
+      const sugarNutrient = nutrients.find((nutrient) =>
+        nutrient.nutrientName.toLowerCase().includes("sugar")
+      );
+
+      if (sugarNutrient) {
+        if (sugarNutrient.value > 0) {
+          return sugarNutrient.value; // כמות הסוכר
+        } else {
+          console.log("Sugar content is 0 for this food item."); // טיפולי במקרה סוכר אפס
+          return 0; // או ערך אחר שנראה לך מתאים
+        }
+      } else {
+        console.log("No sugar data found for this food item.");
+        return null;
+      }
+    } else {
+      console.log("No food items found.");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching data from USDA API:", error);
+    return null;
+  }
+}
+
 const upload = multer({ storage: storage });
 
+// הוספת ארוחה חדשה
+exports.addMeal = async (req, res) => {
+  const {
+    meal_date,
+    mealType,
+    image,
+    description,
+    bloodSugar,
+    // foodSugar,
+    // event,
+    // UserId is not needed from req.body anymore
+  } = req.body;
+
+  const specialEvent = await checkSpecialEvent(meal_date);
+  console.log(specialEvent.isSpecial);
+  console.log(image);
+  const isFood = await isFoodImage(image); // Assuming this function checks if the image is food
+  console.log(isFood);
+  if (!isFood) {
+    return res.status(400).send("The uploaded image is not food.");
+  }
+
+  if (!req.session.userId) {
+    return res.status(401).send("You must be logged in to add a meal.");
+  }
+  const foodSugar = await getFoodSugarFromUSDA(description);
+  if (!foodSugar) {
+    return res
+      .status(400)
+      .send("Unable to retrieve sugar information for the food.");
+  }
+
+  const UserId = req.session.userId; // Automatically take UserId from session
+
+  try {
+    await sql.connect(dbConnectionString);
+
+    const insertQuery = `
+      INSERT INTO meals (meal_date, mealType, image, description, bloodSugar, foodSugar, event, UserId)
+      VALUES (@meal_date, @mealType, @image, @description, @bloodSugar, @foodSugar, @event, @UserId)
+    `;
+
+    const insertRequest = new sql.Request();
+    insertRequest.input("meal_date", sql.Date, meal_date);
+    insertRequest.input("mealType", sql.VarChar, mealType);
+    insertRequest.input("image", sql.VarChar, image);
+    insertRequest.input("description", sql.VarChar, description);
+    insertRequest.input("bloodSugar", sql.Float, bloodSugar);
+    insertRequest.input("foodSugar", sql.Float, foodSugar);
+    insertRequest.input("event", sql.VarChar, specialEvent.isSpecial); // שים את התוצאה מהפונקציה כאן
+    insertRequest.input("UserId", sql.VarChar, UserId); // Using session UserId
+
+    await insertRequest.query(insertQuery);
+    console.log("Meal added successfully");
+
+    res.redirect("/meals/history");
+  } catch (err) {
+    console.error("Database insert error:", err);
+    res.status(500).send("Error adding meal: " + err.message);
+  } finally {
+    await sql.close();
+  }
+};
 // Route for rendering the update meal page
 exports.getMealUpdatePage = (req, res) => {
   if (req.session.userId) {
@@ -80,65 +183,6 @@ async function checkSpecialEvent(meal_date) {
     };
   }
 }
-
-// הוספת ארוחה חדשה
-exports.addMeal = async (req, res) => {
-  const {
-    meal_date,
-    mealType,
-    image,
-    description,
-    bloodSugar,
-    foodSugar,
-    // event,
-    // UserId is not needed from req.body anymore
-  } = req.body;
-
-  const specialEvent = await checkSpecialEvent(meal_date);
-  console.log(specialEvent.isSpecial);
-  console.log(image);
-  const isFood = await isFoodImage(image); // Assuming this function checks if the image is food
-  console.log(isFood);
-  if (!isFood) {
-    return res.status(400).send("The uploaded image is not food.");
-  }
-
-  if (!req.session.userId) {
-    return res.status(401).send("You must be logged in to add a meal.");
-  }
-
-  const UserId = req.session.userId; // Automatically take UserId from session
-
-  try {
-    await sql.connect(dbConnectionString);
-
-    const insertQuery = `
-      INSERT INTO meals (meal_date, mealType, image, description, bloodSugar, foodSugar, event, UserId)
-      VALUES (@meal_date, @mealType, @image, @description, @bloodSugar, @foodSugar, @event, @UserId)
-    `;
-
-    const insertRequest = new sql.Request();
-    insertRequest.input("meal_date", sql.Date, meal_date);
-    insertRequest.input("mealType", sql.VarChar, mealType);
-    insertRequest.input("image", sql.VarChar, image);
-    insertRequest.input("description", sql.VarChar, description);
-    insertRequest.input("bloodSugar", sql.Float, bloodSugar);
-    insertRequest.input("foodSugar", sql.Float, foodSugar);
-    insertRequest.input("event", sql.VarChar, specialEvent.isSpecial); // שים את התוצאה מהפונקציה כאן
-    insertRequest.input("UserId", sql.VarChar, UserId); // Using session UserId
-
-    await insertRequest.query(insertQuery);
-    console.log("Meal added successfully");
-
-    res.redirect("/meals/history");
-  } catch (err) {
-    console.error("Database insert error:", err);
-    res.status(500).send("Error adding meal: " + err.message);
-  } finally {
-    await sql.close();
-  }
-};
-
 // Display meal history page
 exports.getMealHistoryPage = async (req, res) => {
   if (req.session.userId) {
@@ -212,9 +256,6 @@ exports.getNotificationPage = (req, res) => {
     res.redirect("/login");
   }
 };
-
-const axios = require("axios");
-const got = require("got");
 
 // פונקציה לבדיקת האם התמונה היא של מאכל
 async function isFoodImage(imageFile) {
