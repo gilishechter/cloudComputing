@@ -19,7 +19,6 @@
         height: 100vh;
       }
 
-      /* תפריט עליון שקוף למחצה */
       nav {
         position: fixed;
         top: 0;
@@ -45,10 +44,32 @@
         text-decoration: none;
         font-size: 18px;
         transition: color 0.3s ease;
+        position: relative; /* הכנה למיקום הבועה */
       }
 
       nav .menu a:hover {
         color: #007aff;
+      }
+
+      .tooltip {
+        display: none; /* התחל עם הסתרת הטקסט */
+        position: absolute;
+        background-color: rgba(173, 216, 230, 0.9); /* תכלת לבן */
+        color: #333;
+        padding: 10px;
+        border-radius: 5px;
+        z-index: 1000;
+        margin-top: 5px; /* רווח מעל הטקסט */
+        left: 80%; /* מיקום יותר ימינה */
+        transform: translateX(-50%); /* למרכז את הבועה */
+        white-space: normal; /* מאפשר טקסט לעבור לשורה הבאה */
+        width: 250px; /* רוחב קבוע */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* הצללה */
+      }
+
+      /* הצג את הבועה כשעומדים על ה-about */
+      nav .menu a:hover + .tooltip {
+        display: block;
       }
 
       header {
@@ -62,7 +83,7 @@
         margin-bottom: 30px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       }
-
+      
       .container {
         background-color: white;
         border-radius: 15px;
@@ -72,6 +93,7 @@
         max-width: 600px;
         animation: fadeIn 1s ease-out;
         position: relative;
+        margin-top: 120px; /* הורדת רווח עליון לטופס */
       }
 
       @keyframes fadeIn {
@@ -177,10 +199,23 @@
   </head>
   <body>
     <nav>
-      <div class="logo">Health App</div>
+      <div class="logo">SugarWize</div>
+      <img src="/images/logo.png" alt="Health App Logo" style="height: 40px" />
       <div class="menu">
+      <div class="menu">
+        
         <a href="/users/dashboard">Home</a>
-        <a href="#">Meals</a>
+        <a href="#" id="about-link">About</a>
+        <span class="tooltip"
+          >Our app is designed to empower users in managing their dietary intake
+          effectively. By logging meals, users can accurately track their blood
+          sugar levels. The app intelligently analyzes this data, providing
+          personalized recommendations on whether users need to increase or
+          decrease their sugar intake. Additionally, it sends timely
+          notifications to keep users informed about their health status,
+          ensuring they never miss a beat. Join us on this journey to better
+          health and wellness!</span
+        >
         <a href="#">Profile</a>
       </div>
     </nav>
