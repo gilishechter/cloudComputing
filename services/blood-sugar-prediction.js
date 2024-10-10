@@ -8,19 +8,20 @@ const config = {
   server: "lifestyle.mssql.somee.com",
   database: "lifestyle",
   options: {
-    trustServerCertificate: true, // מתקן בעיות עם תעודות SSL
+    trustServerCertificate: true,
   },
 };
 
 // פונקציה לחלץ נתונים מהמסד נתונים
-async function getData() {
+async function getData(userId, event) {
   try {
-    // התחברות למסד הנתונים
     await sql.connect(config);
 
-    // חיבור למסד הנתונים ושאילתת נתונים
-    const result =
-      await sql.query`SELECT foodSugar AS sugarContent, bloodSugar FROM meals`;
+    // חיבור למסד הנתונים ושאילתת נתונים רק עבור ה-userId הנתון
+    const result = await sql.query`
+      SELECT foodSugar AS sugarContent, bloodSugar 
+      FROM meals 
+      WHERE UserId = ${userId} AND event = ${event}`;
 
     // המרת התוצאות למערך
     const data = result.recordset.map((row) => ({
@@ -32,17 +33,17 @@ async function getData() {
   } catch (err) {
     console.error("Error retrieving data:", err);
   } finally {
-    await sql.close(); // סגירת החיבור למסד הנתונים
+    await sql.close();
   }
 }
 
 // פונקציה לחזוי סוכר בדם
-async function predictBloodSugar(newSugarContent) {
-  const data = await getData(); // קבלת הנתונים מהמסד נתונים
+async function predictBloodSugar(newSugarContent, userId, event) {
+  const data = await getData(userId, event);
 
   if (data.length === 0) {
     console.error("No data retrieved from the database.");
-    return null; // במקרה ואין נתונים, החזר null
+    return null;
   }
 
   // הגדרת תכונות ותוויות
@@ -59,7 +60,7 @@ async function predictBloodSugar(newSugarContent) {
     `Predicted blood sugar for sugar content ${newSugarContent.sugarContent}: ${predictedBloodSugar}`
   );
 
-  return predictedBloodSugar; // החזר את ערך החיזוי
+  return predictedBloodSugar;
 }
 
 module.exports = { predictBloodSugar };

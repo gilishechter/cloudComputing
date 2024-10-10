@@ -235,8 +235,10 @@
           required
         ></textarea>
 
-        <label for="bloodSugar">Blood Sugar Level</label>
-        <input type="number" id="bloodSugar" name="bloodSugar" required />
+        <label for="bloodSugar"
+          >Blood Sugar Level - or let the app predict</label
+        >
+        <input type="number" id="bloodSugar" name="bloodSugar" />
 
         <button type="submit">Submit</button>
       </form>
@@ -269,7 +271,7 @@
 
               if (result.success) {
                 alert(
-                  `The predicted blood sugar level is: ${result.predictedBloodSugar}`
+                  `Your blood sugar level is: ${result.predictedBloodSugar}`
                 );
                 window.location.href = "/meals/history";
               } else {

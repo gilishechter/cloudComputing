@@ -93,7 +93,11 @@ exports.addMeal = async (req, res) => {
 
   if (!bloodSugar) {
     newSugarContent = { sugarContent: foodSugar };
-    finalBloodSugar = await predictBloodSugar(newSugarContent);
+    finalBloodSugar = await predictBloodSugar(
+      newSugarContent,
+      UserId,
+      specialEvent.isSpecial
+    );
     console.log(newSugarContent);
   } else finalBloodSugar = bloodSugar;
 
@@ -124,7 +128,7 @@ exports.addMeal = async (req, res) => {
     await insertRequest.query(insertQuery);
     console.log("Meal added successfully");
 
-    res.json({ success: true, predictedBloodSugar: bloodSugar });
+    res.json({ success: true, predictedBloodSugar: finalBloodSugar });
   } catch (err) {
     console.error("Database insert error:", err);
     res.status(500).send("Error adding meal: " + err.message);
