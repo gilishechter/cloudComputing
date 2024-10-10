@@ -265,6 +265,7 @@
 
             if (contentType && contentType.includes("application/json")) {
               result = await response.json();
+              console.log(result);
 
               if (result.success) {
                 alert(
