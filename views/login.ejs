@@ -1,25 +1,37 @@
-<!-- views/login.ejs -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <h1>Login</h1>
-    <form action="/users/login" method="POST">
-      <label for="username">name:</label>
-      <input type="text" id="username" name="username" required />
+    <header>
+      <h1>Login</h1>
+    </header>
+    <div class="container">
+      <h2>Welcome Back</h2>
+      <form action="/users/login" method="POST" class="login-form">
+        <label for="username">Name:</label>
+        <input type="text" id="username" name="username" required />
 
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required />
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required />
 
-      <% if (errorMessage) { %>
-      <p class="error-message"><%= errorMessage %></p>
-      <% } %>
+        <% if (errorMessage) { %>
+        <p class="error-message"><%= errorMessage %></p>
+        <% } %>
 
-      <button type="submit">Login</button>
-    </form>
+        <button type="submit" class="login-button">Login</button>
+      </form>
+
+      <div class="signup-container">
+        <p>Don't have an account?</p>
+        <a href="/users/signup">
+          <button class="signup-button">Sign Up</button>
+        </a>
+      </div>
+    </div>
   </body>
 </html>

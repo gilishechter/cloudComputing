@@ -5,11 +5,172 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/styles.css" />
     <title>Dashboard</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial,
+          sans-serif;
+        background: linear-gradient(135deg, #e6f7ff, #f0f4f8);
+        margin: 0;
+        padding: 0;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      nav {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 10px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      nav .logo {
+        font-size: 24px;
+        color: #007aff;
+        font-weight: bold;
+      }
+
+      nav .menu a {
+        margin-left: 20px;
+        color: #333;
+        text-decoration: none;
+        font-size: 18px;
+        transition: color 0.3s ease;
+        position: relative; /* Prepare for tooltip positioning */
+      }
+
+      nav .menu a:hover {
+        color: #007aff;
+      }
+
+      .tooltip {
+        display: none; /* Start hidden */
+        position: absolute;
+        background-color: rgba(173, 216, 230, 0.9); /* Light blue */
+        color: #333;
+        padding: 10px;
+        border-radius: 5px;
+        z-index: 1000;
+        margin-top: 5px; /* Space above the text */
+        left: 80%; /* Position further right */
+        transform: translateX(-50%); /* Center the tooltip */
+        white-space: normal; /* Allow text to wrap */
+        width: 250px; /* Fixed width */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
+      }
+
+      /* Show tooltip on hover */
+      nav .menu a:hover + .tooltip {
+        display: block;
+      }
+
+      header {
+        background-color: #007aff;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        font-size: 30px;
+        font-weight: bold;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .container {
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        padding: 40px;
+        width: 90%;
+        max-width: 600px;
+        animation: fadeIn 1s ease-out;
+        margin-top: 50px; /* Added more top space */
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      h1 {
+        color: #007aff;
+        text-align: center;
+        font-size: 32px;
+        margin-bottom: 20px;
+      }
+
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+
+      li {
+        margin: 15px 0;
+      }
+
+      a {
+        color: #007aff;
+        text-decoration: none;
+        font-size: 18px;
+        transition: color 0.3s ease;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      footer {
+        background-color: #007aff;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        font-size: 20px;
+        margin-top: auto; /* Ensure footer is at bottom */
+        width: 100%; /* Set width */
+      }
+    </style>
   </head>
   <body>
-    <header>Welcome to Your Dashboard</header>
+    <nav>
+      <div class="logo">SugarWize</div>
+      <!-- <img src="/images/logo.png" alt="Health App Logo" style="height: 40px" /> -->
+      <div class="menu">
+        <a href="/users/dashboard">Home</a>
+        <a href="#" id="about-link">About</a>
+        <span class="tooltip">
+          Our app is designed to empower users in managing their dietary intake
+          effectively. By logging meals, users can accurately track their blood
+          sugar levels. The app intelligently analyzes this data, providing
+          personalized recommendations on whether users need to increase or
+          decrease their sugar intake. Additionally, it sends timely
+          notifications to keep users informed about their health status,
+          ensuring they never miss a beat. Join us on this journey to better
+          health and wellness!
+        </span>
+        <a href="#">Profile</a>
+      </div>
+    </nav>
+    <img
+      src="/images/logo.png"
+      alt="Health App Logo"
+      style="height: 40px; float: right"
+    />
     <div class="container">
-      <h1>Hello, <%= user.username %>!</h1>
+      <h1>Hello, <%= user.Name %>!</h1>
       <ul>
         <li><a href="/meals/update">Update Meal</a></li>
         <li><a href="/meals/history">View Meal History</a></li>
@@ -23,5 +184,6 @@
       </ul>
       <% } %>
     </div>
+    <footer>© 2024 Health App. All rights reserved.</footer>
   </body>
 </html>
