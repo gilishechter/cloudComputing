@@ -262,6 +262,9 @@
               body: new URLSearchParams(formData),
             });
 
+            // הוספת אבחון של הסטטוס
+            console.log("Response status:", response.status);
+
             const contentType = response.headers.get("content-type");
             let result;
 
