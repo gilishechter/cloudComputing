@@ -92,7 +92,7 @@
         width: 90%;
         max-width: 600px;
         animation: fadeIn 1s ease-out;
-        margin-top: 50px; /* Added more top space */
+        margin-top: 20px; /* Added more top space */
       }
 
       @keyframes fadeIn {
@@ -122,15 +122,24 @@
         margin: 15px 0;
       }
 
-      a {
-        color: #007aff;
-        text-decoration: none;
+      /* Button styles */
+      .button {
+        display: inline-block;
+        background-color: #007aff;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
         font-size: 18px;
-        transition: color 0.3s ease;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        transition: background-color 0.3s, transform 0.2s;
+        box-shadow: 0 4px 15px rgba(0, 122, 255, 0.5);
       }
 
-      a:hover {
-        text-decoration: underline;
+      .button:hover {
+        background-color: #005bb5;
+        transform: translateY(-2px);
       }
 
       footer {
@@ -147,7 +156,6 @@
   <body>
     <nav>
       <div class="logo">SugarWize</div>
-      <!-- <img src="/images/logo.png" alt="Health App Logo" style="height: 40px" /> -->
       <div class="menu">
         <a href="/users/dashboard">Home</a>
         <a href="#" id="about-link">About</a>
@@ -167,13 +175,13 @@
     <img
       src="/images/logo.png"
       alt="Health App Logo"
-      style="height: 40px; float: right"
+      style="height: 40px; width: auto; height: 400px"
     />
     <div class="container">
       <h1>Hello, <%= user.Name %>!</h1>
       <ul>
-        <li><a href="/meals/update">Update Meal</a></li>
-        <li><a href="/meals/history">View Meal History</a></li>
+        <li><a href="/meals/update" class="button">Update Meal</a></li>
+        <li><a href="/meals/history" class="button">View Meal History</a></li>
       </ul>
       <% if (notifications && notifications.length > 0) { %>
       <h2>Recent Notifications</h2>
