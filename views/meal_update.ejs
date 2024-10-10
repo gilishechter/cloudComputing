@@ -7,6 +7,29 @@
     <title>Update Meal</title>
   </head>
   <body>
+    <nav>
+      <div class="logo">SugarWize</div>
+      <div class="menu">
+        <a href="/users/dashboard">Home</a>
+        <a href="#" id="about-link">About</a>
+        <span class="tooltip"
+          >Our app is designed to empower users in managing their dietary intake
+          effectively. By logging meals, users can accurately track their blood
+          sugar levels. The app intelligently analyzes this data, providing
+          personalized recommendations on whether users need to increase or
+          decrease their sugar intake. Additionally, it sends timely
+          notifications to keep users informed about their health status,
+          ensuring they never miss a beat. Join us on this journey to better
+          health and wellness!</span
+        >
+        <a href="#">Profile</a>
+      </div>
+    </nav>
+    <img
+      src="/images/logo.png"
+      alt="Health App Logo"
+      style="height: 40px; width: auto; height: 400px"
+    />
     <header>Update Your Meal</header>
     <div class="container">
       <h1>Update Meal</h1>
@@ -14,6 +37,7 @@
         action="/meals/add"
         method="POST"
         enctype="application/x-www-form-urlencoded"
+        id="mealForm"
       >
         <label for="meal_date">Date</label>
         <input type="datetime-local" id="meal_date" name="meal_date" required />
@@ -35,13 +59,61 @@
         />
 
         <label for="description">Description</label>
-        <input type="text" id="description" name="description" required />
+        <textarea
+          id="description"
+          name="description"
+          placeholder="Enter meal description"
+          required
+        ></textarea>
 
-        <label for="foodSugar">Measured Sugar Level (after 2 hours)</label>
+        <label for="bloodSugar">Blood Sugar Level</label>
         <input type="number" id="bloodSugar" name="bloodSugar" required />
 
         <button type="submit">Submit</button>
       </form>
     </div>
+
+    <script>
+      document
+        .getElementById("mealForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault(); // למנוע שליחת טופס רגילה
+
+          const formData = new FormData(this);
+
+          try {
+            // שליחת הנתונים לשרת
+            const response = await fetch("/meals/add", {
+              method: "POST",
+              body: new URLSearchParams(formData),
+            });
+
+            const contentType = response.headers.get("content-type");
+            let result;
+
+            if (contentType && contentType.includes("application/json")) {
+              result = await response.json(); // הנחה שהשרת מחזיר תשובה כ-JSON
+
+              if (result.success) {
+                // הצגת החלונית הקופצת עם הערך שחוזה
+                alert(
+                  `The predicted blood sugar level is: ${result.predictedBloodSugar}`
+                );
+
+                // מעבר למסך ההיסטוריה
+                window.location.href = "/meals/history"; // עדכן ל-URL של מסך ההיסטוריה
+              } else {
+                alert("Failed to update meal. Please try again.");
+              }
+            } else {
+              const text = await response.text(); // לקבל את התגובה כטקסט אם לא JSON
+              alert(`Error: ${text}`);
+            }
+          } catch (err) {
+            console.error("Error submitting meal:", err);
+            alert("An error occurred while submitting the meal.");
+          }
+        });
+    </script>
   </body>
 </html>
