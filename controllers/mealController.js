@@ -64,7 +64,7 @@ const { predictBloodSugar } = require("../services/blood-sugar-prediction");
 const moment = require("moment-timezone");
 
 exports.addMeal = async (req, res) => {
-  const { meal_date, mealType, image, description } = req.body;
+  const { meal_date, mealType, image, description, bloodSugar } = req.body;
 
   const specialEvent = await checkSpecialEvent(meal_date);
   console.log(specialEvent.isSpecial);
@@ -89,10 +89,13 @@ exports.addMeal = async (req, res) => {
   }
 
   const UserId = req.session.userId;
+  let finalBloodSugar;
 
-  const newSugarContent = { sugarContent: foodSugar };
-  const bloodSugar = await predictBloodSugar(newSugarContent);
-  console.log(newSugarContent);
+  if (!bloodSugar) {
+    newSugarContent = { sugarContent: foodSugar };
+    finalBloodSugar = await predictBloodSugar(newSugarContent);
+    console.log(newSugarContent);
+  } else finalBloodSugar = bloodSugar;
 
   try {
     await sql.connect(dbConnectionString);
@@ -113,7 +116,7 @@ exports.addMeal = async (req, res) => {
     insertRequest.input("mealType", sql.VarChar, mealType);
     insertRequest.input("image", sql.VarChar, image);
     insertRequest.input("description", sql.VarChar, description);
-    insertRequest.input("bloodSugar", sql.Float, bloodSugar);
+    insertRequest.input("bloodSugar", sql.Float, finalBloodSugar);
     insertRequest.input("foodSugar", sql.Float, foodSugar);
     insertRequest.input("event", sql.VarChar, specialEvent.isSpecial);
     insertRequest.input("UserId", sql.VarChar, UserId);

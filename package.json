@@ -13,6 +13,7 @@
     "axios": "^1.7.7",
     "chart.js": "^4.4.4",
     "decision-tree": "^0.3.7",
+    "defer-to-connect": "^2.0.1",
     "ejs": "^3.1.10",
     "express": "^4.21.0",
     "express-session": "^1.18.0",
