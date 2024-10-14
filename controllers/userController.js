@@ -6,6 +6,10 @@ exports.getLoginPage = (req, res) => {
   req.session.errorMessage = null;
   res.render("login", { errorMessage });
 };
+exports.getAboutPages = (req, res) => {
+  const appName = "SugerWize"; // תן כאן את שם האפליקציה שלך
+  res.render("about", { appName }); // העבר את appName ל-EJS
+};
 
 // Route to handle login form submission
 exports.login = async (req, res) => {
