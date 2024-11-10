@@ -5,89 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>About Us - <%= appName %></title>
 
-    <div class="qa-bot">
-      <h2>Questions and Answers</h2>
-      <div class="input-container">
-        <input
-          type="text"
-          id="user-question"
-          placeholder="Ask your question here..."
-        />
-        <button onclick="sendQuestion()">Send</button>
-      </div>
-      <div id="answer" class="answer-box"></div>
-    </div>
-
     <style>
-      .qa-bot {
-        margin: 40px auto;
-        padding: 20px;
-        background-color: rgba(240, 248, 255, 0.9); /* עדין יותר */
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        text-align: center;
-        max-width: 600px;
-      }
-
-      .input-container {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        margin-bottom: 15px;
-      }
-
-      .qa-bot input {
-        width: 70%;
-        padding: 12px;
-        border-radius: 25px;
-        border: 1px solid #ccc;
-        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
-        font-size: 16px;
-      }
-
-      .qa-bot button {
-        padding: 12px 25px;
-        border: none;
-        border-radius: 25px;
-        background-color: #007aff;
-        color: white;
-        cursor: pointer;
-        font-size: 16px;
-        transition: background-color 0.3s ease;
-      }
-
-      .qa-bot button:hover {
-        background-color: #005bb5;
-      }
-
-      .answer-box {
-        margin-top: 10px;
-        background-color: #f0f8ff;
-        padding: 15px;
-        border-radius: 15px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        font-size: 16px;
-        color: #333;
-        min-height: 50px;
-      }
-
-      .loading {
-        display: inline-block;
-        width: 24px;
-        height: 24px;
-        border: 3px solid rgba(0, 0, 0, 0.1);
-        border-radius: 50%;
-        border-top-color: #007aff;
-        animation: spin 1s linear infinite;
-        margin-left: 10px;
-      }
-
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-
+      /* CSS for main structure and styling */
       body {
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         margin: 0;
@@ -124,7 +43,7 @@
         text-decoration: none;
         font-size: 18px;
         transition: color 0.3s ease;
-        position: relative; /* Required for tooltip positioning */
+        position: relative;
       }
 
       nav .menu a:hover {
@@ -200,38 +119,6 @@
         max-width: 800px;
         border-radius: 15px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      }
-
-      /* Q&A Bot Styles */
-      .qa-bot {
-        margin: 40px auto;
-        padding: 20px;
-        background-color: rgba(255, 255, 255, 0.9);
-        border-radius: 15px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        text-align: center;
-      }
-
-      .qa-bot input {
-        width: 80%;
-        padding: 10px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        margin-bottom: 10px;
-      }
-
-      .qa-bot button {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        background-color: #007aff;
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-      }
-
-      .qa-bot button:hover {
-        background-color: #005bb5;
       }
     </style>
   </head>
@@ -321,41 +208,5 @@
     <footer>
       <p>&copy; 2024 SugarWize - All rights reserved.</p>
     </footer>
-
-    <script>
-      async function sendQuestion() {
-        const question = document.getElementById("user-question").value;
-        const answerDiv = document.getElementById("answer");
-
-        // Reset previous answer and show loading indicator
-        answerDiv.innerHTML = 'Loading <div class="loading"></div>';
-
-        try {
-          const response = await fetch(
-            "http://localhost:5005/webhooks/rest/webhook",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ sender: "user", message: question }),
-            }
-          );
-
-          const data = await response.json();
-
-          if (data.length > 0) {
-            answerDiv.innerHTML = `<strong>AI Answer:</strong> ${data[0].text}`;
-          } else {
-            answerDiv.innerHTML = "Sorry, I didn't understand that.";
-          }
-        } catch (error) {
-          answerDiv.innerHTML = "Error connecting to AI: " + error.message;
-        }
-
-        // Clear the input field after sending
-        document.getElementById("user-question").value = "";
-      }
-    </script>
   </body>
 </html>
