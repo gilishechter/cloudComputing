@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const { consumeTestResult } = require("../kafka/testResultsConsumer");
 
 // Route to render the login form
 exports.getLoginPage = (req, res) => {
@@ -16,6 +17,7 @@ exports.login = async (req, res) => {
 
     if (users.length > 0) {
       req.session.userId = users[0].UserId; // Adjust 'UserId' to match your column name
+      await consumeTestResult();
       res.redirect("/users/dashboard");
     } else {
       req.session.errorMessage = "Invalid username or password";

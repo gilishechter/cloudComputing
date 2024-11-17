@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <!-- ייבוא ה-header -->
+    <%- include('../partials/header') %>
+
+    <!-- לוגו גדול במרכז המסך -->
+    <div class="login-logo">
+      <img src="/images/logo.png" alt="Health App Logo" />
+    </div>
+
+    <div class="container">
+      <h2>Welcome To SugarWize!</h2>
+      <form action="/users/login" method="POST" class="login-form">
+        <label for="username">Name:</label>
+        <input type="text" id="username" name="username" required />
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required />
+
+        <% if (errorMessage) { %>
+        <p class="error-message"><%= errorMessage %></p>
+        <% } %>
+
+        <button type="submit" class="login-button">Login</button>
+      </form>
+
+      <div class="signup-container">
+        <p>Don't have an account?</p>
+        <a href="/users/signup">
+          <button class="signup-button">Sign Up</button>
+        </a>
+      </div>
+    </div>
+
+    <!-- ייבוא ה-footer -->
+    <%- include('../partials/footer') %>
+
+    <script>
+      var isLoggedIn = false; // סימולציה של מצב התחברות
+
+      document
+        .getElementById("home-link")
+        .addEventListener("click", function (event) {
+          if (!isLoggedIn) {
+            event.preventDefault();
+            alert("You need to login first!");
+          }
+        });
+    </script>
+  </body>
+</html>

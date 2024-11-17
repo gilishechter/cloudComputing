@@ -24,7 +24,7 @@ app.use(
 
 // Set EJS as template engine
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
+app.set("views", path.join(__dirname, "views/pages"));
 
 // Routes
 const userRoutes = require("./routes/userRoutes");

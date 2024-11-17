@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/styles.css" />
+    <title>Dashboard</title>
+  </head>
+  <body>
+    <%- include('../partials/header') %>
+
+    <img
+      src="/images/logo.png"
+      alt="Health App Logo"
+      style="height: 40px; width: auto; height: 400px"
+    />
+    <div class="container">
+      <h1>Hello, <%= user.Name %>!</h1>
+      <div class="button-container">
+        <a href="/meals/update" class="buttonD">Update Meal</a>
+        <a href="/meals/history" class="buttonD">View Meal History</a>
+      </div>
+
+      <% if (notifications && notifications.length > 0) { %>
+      <h2>Recent Notifications</h2>
+      <ul>
+        <% notifications.forEach(notification => { %>
+        <li><%= notification.message %></li>
+        <% }); %>
+      </ul>
+      <% } %>
+    </div>
+    <%- include('../partials/footer') %>
+  </body>
+</html>
