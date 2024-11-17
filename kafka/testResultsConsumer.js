@@ -1,5 +1,5 @@
 const kafka = require("../config/kafkaConfig");
-//const messageService = require('./messageService');
+const messageService = require("./messageService");
 let consumer;
 
 // Initialize the consumer
@@ -11,7 +11,7 @@ const consumeTestResult = async () => {
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
       const receivedMessage = JSON.parse(message.value.toString());
-      //messageService.broadcastMessage(receivedMessage.message);
+      messageService.broadcastMessage(receivedMessage.message);
       console.log(receivedMessage.message);
     },
   });

@@ -1,0 +1,54 @@
+<div id="message-box" class="hidden">Waiting for messages...</div>
+
+<style>
+  /* עיצוב כללי לתיבת ההודעות */
+  #message-box {
+    display: none; /* מוסתר כברירת מחדל */
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #323232;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    text-align: center;
+    z-index: 1000;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  /* אפקטי אנימציה */
+  #message-box.show {
+    display: block;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  #message-box.hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+</style>
+<script>
+  const socket = io();
+  const messageBox = document.getElementById("message-box");
+
+  // האזנה להודעות
+  socket.on("kafka message", (msg) => {
+    // עדכון תוכן ההודעה
+    messageBox.textContent = msg;
+
+    // הצגת ההודעה עם אפקט
+    messageBox.classList.remove("hidden");
+    messageBox.classList.add("show");
+
+    // החבאת ההודעה לאחר 10 שניות
+    setTimeout(() => {
+      messageBox.classList.remove("show");
+      messageBox.classList.add("hidden");
+    }, 10000);
+  });
+</script>

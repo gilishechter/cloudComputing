@@ -2,11 +2,16 @@ const express = require("express");
 const path = require("path");
 const sql = require("mssql");
 const session = require("express-session");
+const socketIo = require("socket.io");
+const messageService = require("./kafka/messageService");
 
 const { Configuration, OpenAIApi } = require("openai");
 
+const http = require("http");
 const app = express();
 const PORT = process.env.PORT || 3000;
+const server = http.createServer(app);
+const io = socketIo(server);
 
 // MSSQL Connection String
 const dbConnectionString =
@@ -14,6 +19,15 @@ const dbConnectionString =
 // Middleware
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
+
+messageService.initializeSocket(io);
+
+io.on("connection", (socket) => {
+  console.log("New client connected");
+  socket.on("disconnect", () => {
+    console.log("client disconnected");
+  });
+});
 
 // Session Configuration
 app.use(
@@ -46,6 +60,6 @@ app.use((err, req, res, next) => {
 });
 
 // Start the server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}/users/login`);
 });

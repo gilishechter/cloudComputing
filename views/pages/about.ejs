@@ -3,9 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="/socket.io/socket.io.js"></script>
     <title>About Us - <%= appName %></title>
 
-    <style>
+    <!-- <style>
       /* CSS for main structure and styling */
       body {
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -120,9 +121,10 @@
         border-radius: 15px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
       }
-    </style>
+    </style> -->
   </head>
   <body>
+    <%- include('../partials/header') %>
     <nav>
       <div class="logo">SugarWize</div>
       <div class="menu">
@@ -135,7 +137,7 @@
       </div>
     </nav>
 
-    <header>Eat Right, Live Bright</header>
+    <!-- <header>Eat Right, Live Bright</header> -->
 
     <div class="container">
       <h2>About <%= appName %></h2>
@@ -205,8 +207,6 @@
       </p>
     </div>
 
-    <footer>
-      <p>&copy; 2024 SugarWize - All rights reserved.</p>
-    </footer>
+    <%- include('../partials/footer') %>
   </body>
 </html>

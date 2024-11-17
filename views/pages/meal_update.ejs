@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="/styles.css" />
     <title>Update Meal</title>
   </head>
   <body class="meal-update-page">
-    <%- include('../partials/header') %>
+    <%- include('../partials/header') %> <%- include('../partials/message') %>
     <img
       src="/images/logo.png"
       alt="Health App Logo"
