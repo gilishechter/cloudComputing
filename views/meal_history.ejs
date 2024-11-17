@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Meal History</title>
+</head>
+<body class="meal-history-page">
+    <nav>
+        <div class="logo">SugarWize</div>
+        <div class="menu">
+          <!-- שינוי קל בכפתור ה-Home כדי לאפשר שימוש ב-JavaScript -->
+          <a href="/users/dashboard">Home</a>
+          <a href="/users/about">About</a>
+        <a href="/users/profile">Profile</a>
+        </div>
+      </nav>
+  
+    <div class="container">
+        <h1>Your Meal History</h1>
+        <form action="/meals/history" method="GET" id="filterForm">
+            <label for="fromDate">From Date</label>
+            <input type="date" id="fromDate" name="fromDate" value="<%= query.fromDate || '' %>" />
+
+            <label for="toDate">To Date</label>
+            <input type="date" id="toDate" name="toDate" value="<%= query.toDate || '' %>" />
+
+            <label for="mealType">Meal Type</label>
+            <select id="mealType" name="mealType">
+                <option value="all" <%= !query.mealType || query.mealType === 'all' ? 'selected' : '' %>>All</option>
+                <option value="breakfast" <%= query.mealType === 'breakfast' ? 'selected' : '' %>>Breakfast</option>
+                <option value="lunch" <%= query.mealType === 'lunch' ? 'selected' : '' %>>Lunch</option>
+                <option value="dinner" <%= query.mealType === 'dinner' ? 'selected' : '' %>>Dinner</option>
+            </select>
+
+            <button type="submit">Filter</button>
+            <button type="button" id="toggleView">Show Chart</button>
+        </form>
+
+        <% if (meals.length > 0) { %>
+        <div class="table-container">
+            <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+                <% meals.forEach(meal => { %>
+                <div class="card">
+                    <img src="<%= meal.image %>" alt="Meal Image" />
+                    <h3 style="color: #4a90e2;"><%= meal.mealType %></h3>
+                    <p>Date: <%= formatDate(meal.meal_date) %></p>
+                    <p>Description: <%= meal.description %></p>
+                    <p>Blood Sugar: <%= meal.bloodSugar %></p>
+                    <p>Food Sugar: <%= meal.foodSugar %></p>
+                    <p>Event: <%= meal.event %></p>
+                </div>
+                <% }); %>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2 style="color: #4a90e2;">Blood Sugar Levels Chart</h2>
+            <canvas id="bloodSugarChart" width="400" height="200"></canvas>
+        </div>
+        <% } else { %>
+        <p>No meals found.</p>
+        <% } %>
+    </div>
+
+    
+    <script>
+        document.getElementById('toggleView').addEventListener('click', function() {
+            const tableContainer = document.querySelector('.table-container');
+            const chartContainer = document.querySelector('.chart-container');
+            if (tableContainer.style.display === 'block') {
+                tableContainer.style.display = 'none';
+                chartContainer.style.display = 'block';
+                this.textContent = 'Show Table';
+                renderChart();
+            } else {
+                tableContainer.style.display = 'block';
+                chartContainer.style.display = 'none';
+                this.textContent = 'Show Chart';
+            }
+        });
+
+        document.getElementById('filterForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+            const mealType = document.getElementById('mealType').value;
+
+            fetch(`/meals/history?fromDate=${fromDate}&toDate=${toDate}&mealType=${mealType}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.body.innerHTML = html;
+                });
+        });
+
+        const meals = <%- JSON.stringify(meals) %>;
+
+        const dates = meals.map(meal => meal.meal_date.split("T")[0]);
+        const bloodSugarLevels = meals.map(meal => meal.bloodSugar);
+
+        const ctx = document.getElementById('bloodSugarChart').getContext('2d');
+        const bloodSugarChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Blood Sugar Level',
+                    data: bloodSugarLevels,
+                    borderColor: 'rgba(74, 144, 226, 1)',
+                    backgroundColor: 'rgba(74, 144, 226, 0.2)',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

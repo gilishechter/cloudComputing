@@ -3,6 +3,8 @@ const path = require("path");
 const sql = require("mssql");
 const session = require("express-session");
 
+const { Configuration, OpenAIApi } = require("openai");
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 

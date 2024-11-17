@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/styles.css" />
+    <title>Update Meal</title>
+  </head>
+  <body class="meal-update-page">
+    <nav>
+      <div class="logo">SugarWize</div>
+      <div class="menu">
+        <a href="/users/dashboard">Home</a>
+        <a href="/users/about">About</a>
+        <a href="/users/profile">Profile</a>
+      </div>
+    </nav>
+    <img
+      src="/images/logo.png"
+      alt="Health App Logo"
+      style="
+        height: 40px;
+        width: auto;
+        height: 150px;
+        position: absolute;
+        margin-top: 35px;
+        left: 0;
+      "
+    />
+
+    <div class="container">
+      <h1>Update Meal</h1>
+      <form
+        action="/meals/add"
+        method="POST"
+        enctype="application/x-www-form-urlencoded"
+        id="mealForm"
+      >
+        <label for="meal_date">Date</label>
+        <input type="datetime-local" id="meal_date" name="meal_date" required />
+
+        <label for="mealType">Meal Type</label>
+        <select id="mealType" name="mealType" required>
+          <option value="breakfast">Breakfast</option>
+          <option value="lunch">Lunch</option>
+          <option value="dinner">Dinner</option>
+        </select>
+
+        <label for="image">Meal Image URL</label>
+        <input
+          type="text"
+          id="image"
+          name="image"
+          placeholder="Enter image URL"
+          required
+        />
+
+        <label for="description">Description</label>
+        <textarea
+          id="description"
+          name="description"
+          placeholder="Enter meal description"
+          required
+        ></textarea>
+
+        <label for="bloodSugar"
+          >Blood Sugar Level - or let the app predict</label
+        >
+        <input type="number" id="bloodSugar" name="bloodSugar" />
+
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+
+    <footer>
+      <p>&copy; 2024 SugarWize- All Rights Reserved.</p>
+    </footer>
+
+    <script>
+      document
+        .getElementById("mealForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const formData = new FormData(this);
+
+          try {
+            const response = await fetch("/meals/add", {
+              method: "POST",
+              body: new URLSearchParams(formData),
+            });
+
+            // הוספת אבחון של הסטטוס
+            console.log("Response status:", response.status);
+
+            const contentType = response.headers.get("content-type");
+            let result;
+
+            if (contentType && contentType.includes("application/json")) {
+              result = await response.json();
+              console.log(result);
+
+              if (result.success) {
+                alert(
+                  `Your blood sugar level is: ${result.predictedBloodSugar}`
+                );
+                window.location.href = "/meals/history";
+              } else {
+                alert("Failed to update meal. Please try again.");
+              }
+            } else {
+              const text = await response.text();
+              alert(`Error: ${text}`);
+            }
+          } catch (err) {
+            console.error("Error submitting meal:", err);
+            alert("An error occurred while submitting the meal.");
+          }
+        });
+    </script>
+  </body>
+</html>

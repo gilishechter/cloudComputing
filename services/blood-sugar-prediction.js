@@ -63,4 +63,23 @@ async function predictBloodSugar(newSugarContent, userId, event) {
   return predictedBloodSugar;
 }
 
-module.exports = { predictBloodSugar };
+async function sendQuestion() {
+  const question = document.getElementById("user-question").value;
+  const responseDiv = document.getElementById("response");
+
+  if (question) {
+    const response = await fetch("/ask", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ question: question }),
+    });
+    const data = await response.json();
+    responseDiv.innerText = data.answer;
+  } else {
+    responseDiv.innerText = "אנא הקלד שאלה.";
+  }
+}
+
+module.exports = { predictBloodSugar, sendQuestion };
