@@ -16,10 +16,5 @@ const disconnectKafkaConsumer = async (req, res) => {
     await testResultConsumer.disconnect();
     testResultConsumer = null; // Reset the consumer to allow reconnecting later
   }
-
-  // Clear user session
-  req.session.destroy(); // Destroy session to log the user out
-  //res.render("pages/index"); //redirect to the home page or login page };
-  res.redirect("/users/login");
 };
 module.exports = { startkafkaConsumer, disconnectKafkaConsumer };
