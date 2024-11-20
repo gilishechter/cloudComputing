@@ -1,19 +1,6 @@
-const multer = require("multer");
 const moment = require("moment-timezone");
 const mealModel = require("../models/mealModel");
 const { predictBloodSugar } = require("../services/blood-sugar-prediction");
-
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // Change to your uploads folder
-  },
-  filename: function (req, file, cb) {
-    cb(null, `${Date.now()}-${file.originalname}`); // Unique file name
-  },
-});
-
-const upload = multer({ storage: storage });
 
 exports.addMeal = async (req, res) => {
   const { meal_date, mealType, image, description, bloodSugar } = req.body;
@@ -30,10 +17,11 @@ exports.addMeal = async (req, res) => {
   }
 
   const UserId = req.session.userId;
-  let finalBloodSugar;
 
   const specialEvent = await mealModel.checkSpecialEvent(meal_date);
   console.log(specialEvent.isSpecial);
+
+  let finalBloodSugar;
 
   if (!bloodSugar) {
     const newSugarContent = { sugarContent: foodSugar };

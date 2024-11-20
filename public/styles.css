@@ -218,6 +218,9 @@ footer {
   border-radius: 5px;
   text-align: center;
   font-size: 16px;
+
+  margin: 0 auto; /* תומך במרכז אופקי אם הכפתור נמצא בתוך אלמנט עם width קבוע */
+  display: block;
 }
 
 .buttonD:hover {
@@ -1161,8 +1164,8 @@ section {
 .about-page section:hover {
   transform: scale(1.02);
 }
-.about-page
-/* Section Header */
+/* .about-page
+Section Header
 section h2 {
   font-size: 2.5rem;
   color: #2e6bb8;
@@ -1170,7 +1173,7 @@ section h2 {
   margin-bottom: 20px;
   text-shadow: 0px 5px 10px rgba(46, 107, 184, 0.5);
   animation: fadeIn 1.5s ease;
-}
+} */
 
 /* Fade In Animation */
 @keyframes fadeIn {
@@ -1247,8 +1250,8 @@ ul {
   color: #2e6bb8;
 }
 
-.about-page
-/* Footer Styling */
+/* .about-page
+/* Footer Styling 
 footer {
   background-color: #333;
   color: #fff;
@@ -1259,4 +1262,35 @@ footer {
 }
 .about-page footer a:hover {
   text-decoration: underline;
+} */
+
+/* עיצוב כללי לתיבת ההודעות */
+#message-box {
+  display: none; /* מוסתר כברירת מחדל */
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #323232;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  text-align: center;
+  z-index: 1000;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* אפקטי אנימציה */
+#message-box.show {
+  display: block;
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+#message-box.hidden {
+  opacity: 0;
+  transform: translateX(-50%) translateY(20px);
 }

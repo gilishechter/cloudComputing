@@ -1,15 +1,16 @@
 const sql = require("mssql");
+const dbConnectionString = require("../config/dbConfig");
 
 // MSSQL Connection String
-const dbConnectionString =
-  "workstation id=lifestyle.mssql.somee.com;packet size=4096;user id=adiitzkovich_SQLLogin_1;pwd=lnc8u82ax8;data source=lifestyle.mssql.somee.com;persist security info=False;initial catalog=lifestyle;TrustServerCertificate=True";
+// const dbConnectionString =
+//   "workstation id=lifestyle.mssql.somee.com;packet size=4096;user id=adiitzkovich_SQLLogin_1;pwd=lnc8u82ax8;data source=lifestyle.mssql.somee.com;persist security info=False;initial catalog=lifestyle;TrustServerCertificate=True";
 
-// פונקציה שמתחברת למסד הנתונים
+//connect to the db
 const connectToDatabase = async () => {
   await sql.connect(dbConnectionString);
 };
 
-// פונקציה לקבלת משתמש על פי שם וסיסמה
+//get user by name and Id
 exports.getUserByCredentials = async (username, password) => {
   await connectToDatabase();
   const request = new sql.Request();
@@ -23,7 +24,7 @@ exports.getUserByCredentials = async (username, password) => {
   return result.recordset;
 };
 
-// פונקציה לבדוק אם משתמש קיים
+//check user's existing
 exports.checkUserExists = async (name) => {
   await connectToDatabase();
   const checkRequest = new sql.Request();
@@ -36,7 +37,7 @@ exports.checkUserExists = async (name) => {
   return checkResult.recordset.length > 0;
 };
 
-// פונקציה להוספת משתמש חדש
+// add new user
 exports.createUser = async (userId, name, password) => {
   await connectToDatabase();
   const request = new sql.Request();
@@ -49,7 +50,7 @@ exports.createUser = async (userId, name, password) => {
   );
 };
 
-// פונקציה לקבלת משתמש על פי ID
+//get user by Id
 exports.getUserById = async (userId) => {
   await connectToDatabase();
   const request = new sql.Request();

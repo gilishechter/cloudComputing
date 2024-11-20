@@ -1,4 +1,5 @@
 const { consumeTestResult } = require("./testResultsConsumer");
+
 let testResultConsumer; // Declare the test result consumer
 
 const startkafkaConsumer = async (req, res) => {

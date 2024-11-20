@@ -20,15 +20,6 @@
         <a href="/meals/update" class="buttonD">Update Meal</a>
         <a href="/meals/history" class="buttonD">View Meal History</a>
       </div>
-
-      <% if (notifications && notifications.length > 0) { %>
-      <h2>Recent Notifications</h2>
-      <ul>
-        <% notifications.forEach(notification => { %>
-        <li><%= notification.message %></li>
-        <% }); %>
-      </ul>
-      <% } %>
     </div>
     <%- include('../partials/footer') %>
   </body>

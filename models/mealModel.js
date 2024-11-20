@@ -2,13 +2,15 @@ const sql = require("mssql");
 const axios = require("axios");
 const moment = require("moment-timezone");
 const got = require("got");
+const dbConnectionString = require("../config/dbConfig");
 
 const usdaApiKey = "HNqNjAecPRHVpqTPSiiVmJmw6RP1OEKNigeyGyBc";
 
 // MSSQL Connection String
-const dbConnectionString =
-  "workstation id=lifestyle.mssql.somee.com;packet size=4096;user id=adiitzkovich_SQLLogin_1;pwd=lnc8u82ax8;data source=lifestyle.mssql.somee.com;persist security info=False;initial catalog=lifestyle;TrustServerCertificate=True"; // Replace with your connection string
+// const dbConnectionString =
+//   "workstation id=lifestyle.mssql.somee.com;packet size=4096;user id=adiitzkovich_SQLLogin_1;pwd=lnc8u82ax8;data source=lifestyle.mssql.somee.com;persist security info=False;initial catalog=lifestyle;TrustServerCertificate=True"; // Replace with your connection string
 
+//get the foos sugar from USDA
 async function getFoodSugarFromUSDA(foodName) {
   const urlA = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${usdaApiKey}&query=${foodName}`;
   console.log("Sending API request to USDA:", urlA);
@@ -45,6 +47,7 @@ async function getFoodSugarFromUSDA(foodName) {
   }
 }
 
+//check if the date is saterday or other holidays
 async function checkSpecialEvent(meal_date) {
   try {
     const formattedDate = meal_date.split("T")[0];
@@ -95,6 +98,7 @@ async function checkSpecialEvent(meal_date) {
   }
 }
 
+//add meal to the db
 async function addMealToDatabase(mealData) {
   try {
     await sql.connect(dbConnectionString);
@@ -156,18 +160,13 @@ async function getMealHistory(userId, queryParams) {
     console.log("Database connection closed");
   }
 }
-// פונקציה לבדיקת האם התמונה היא של מאכל
+
 async function isFoodImage(imageFile) {
   const apiKey = "acc_71eedcb15d2dcfb";
   const apiSecret = "3558f7524068505d30a5cace9f414f32";
 
   // ה-URL של התמונה
   const imageUrl = imageFile;
-  //const imageUrl = encodeURIComponent(imageFile);
-
-  // נקודת הקצה של Imagga ליצירת תגים
-  //const endpoint = "https://api.imagga.com";
-
   const url =
     "https://api.imagga.com/v2/tags?image_url=" + encodeURIComponent(imageUrl);
 
@@ -183,7 +182,9 @@ async function isFoodImage(imageFile) {
   };
 
   try {
-    const tags = await getTags(imageUrl); // השתמש ב-await כאן
+    const tags = await getTags(imageUrl);
+    // הדפסת התוכן של tags
+    //console.log("Tags response:", JSON.stringify(tags, null, 2));
     const foodTags = [
       "food",
       "meal",

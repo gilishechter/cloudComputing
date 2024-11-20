@@ -13,9 +13,15 @@ const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
 const io = socketIo(server);
 
-// MSSQL Connection String
-const dbConnectionString =
-  "workstation id=lifestyle.mssql.somee.com;packet size=4096;user id=adiitzkovich_SQLLogin_1;pwd=lnc8u82ax8;data source=lifestyle.mssql.somee.com;persist security info=False;initial catalog=lifestyle;TrustServerCertificate=True";
+// Session Configuration
+app.use(
+  session({
+    secret: "your_secret_key", // Change this to something unique
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
 // Middleware
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
@@ -28,15 +34,6 @@ io.on("connection", (socket) => {
     console.log("client disconnected");
   });
 });
-
-// Session Configuration
-app.use(
-  session({
-    secret: "your_secret_key", // Change this to something unique
-    resave: false,
-    saveUninitialized: true,
-  })
-);
 
 // Set EJS as template engine
 app.set("view engine", "ejs");

@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
-const { consumeTestResult } = require("../kafka/testResultsConsumer");
+const { startkafkaConsumer } = require("../kafka/kafkaMiddleware");
+const { disconnectKafkaConsumer } = require("../kafka/kafkaMiddleware");
 
 // Route to render the login form
 exports.getLoginPage = (req, res) => {
@@ -8,8 +9,8 @@ exports.getLoginPage = (req, res) => {
   res.render("login", { errorMessage });
 };
 exports.getAboutPages = (req, res) => {
-  const appName = "SugerWize"; // תן כאן את שם האפליקציה שלך
-  res.render("about", { appName }); // העבר את appName ל-EJS
+  const appName = "SugerWize";
+  res.render("about", { appName });
 };
 
 // Route to handle login form submission
@@ -21,7 +22,8 @@ exports.login = async (req, res) => {
 
     if (users.length > 0) {
       req.session.userId = users[0].UserId; // Adjust 'UserId' to match your column name
-      await consumeTestResult();
+      await startkafkaConsumer(req, res);
+
       res.redirect("/users/dashboard");
     } else {
       req.session.errorMessage = "Invalid username or password";
@@ -62,7 +64,8 @@ exports.signup = async (req, res) => {
 };
 
 // Logout function
-exports.logout = (req, res) => {
+exports.logout = async (req, res) => {
+  await disconnectKafkaConsumer(req, res);
   req.session.destroy(() => {
     res.redirect("/users/login");
   });

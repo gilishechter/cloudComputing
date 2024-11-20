@@ -1,29 +1,17 @@
 const sql = require("mssql");
 const DecisionTree = require("decision-tree");
+const config = require("../config/dbConfig");
 
-// הגדרת פרטי החיבור למסד הנתונים
-const config = {
-  user: "adiitzkovich_SQLLogin_1",
-  password: "lnc8u82ax8",
-  server: "lifestyle.mssql.somee.com",
-  database: "lifestyle",
-  options: {
-    trustServerCertificate: true,
-  },
-};
-
-// פונקציה לחלץ נתונים מהמסד נתונים
+//get the data from db
 async function getData(userId, event) {
   try {
     await sql.connect(config);
-
-    // חיבור למסד הנתונים ושאילתת נתונים רק עבור ה-userId הנתון
     const result = await sql.query`
       SELECT foodSugar AS sugarContent, bloodSugar 
       FROM meals 
       WHERE UserId = ${userId} AND event = ${event}`;
 
-    // המרת התוצאות למערך
+    //convert to array
     const data = result.recordset.map((row) => ({
       sugarContent: row.sugarContent,
       bloodSugar: row.bloodSugar,
@@ -37,7 +25,7 @@ async function getData(userId, event) {
   }
 }
 
-// פונקציה לחזוי סוכר בדם
+//blood prediction function
 async function predictBloodSugar(newSugarContent, userId, event) {
   const data = await getData(userId, event);
 
@@ -46,14 +34,13 @@ async function predictBloodSugar(newSugarContent, userId, event) {
     return null;
   }
 
-  // הגדרת תכונות ותוויות
-  const features = ["sugarContent"]; // תכונה לחיזוי
-  const className = "bloodSugar"; // תווית לחיזוי
+  const features = ["sugarContent"];
+  const className = "bloodSugar";
 
-  // יצירת עץ החלטה
+  //create the decision tree
   const dt = new DecisionTree(data, className, features);
 
-  // חיזוי רמת הסוכר בדם עבור כמות סוכר חדשה
+  //the prediction for new food sugar
   const predictedBloodSugar = dt.predict(newSugarContent);
 
   console.log(
@@ -63,23 +50,4 @@ async function predictBloodSugar(newSugarContent, userId, event) {
   return predictedBloodSugar;
 }
 
-async function sendQuestion() {
-  const question = document.getElementById("user-question").value;
-  const responseDiv = document.getElementById("response");
-
-  if (question) {
-    const response = await fetch("/ask", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ question: question }),
-    });
-    const data = await response.json();
-    responseDiv.innerText = data.answer;
-  } else {
-    responseDiv.innerText = "אנא הקלד שאלה.";
-  }
-}
-
-module.exports = { predictBloodSugar, sendQuestion };
+module.exports = { predictBloodSugar };
