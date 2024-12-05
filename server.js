@@ -4,9 +4,7 @@ const sql = require("mssql");
 const session = require("express-session");
 const socketIo = require("socket.io");
 const messageService = require("./kafka/messageService");
-
 const { Configuration, OpenAIApi } = require("openai");
-
 const http = require("http");
 const app = express();
 const PORT = process.env.PORT || 3000;

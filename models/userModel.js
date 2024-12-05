@@ -1,10 +1,6 @@
 const sql = require("mssql");
 const dbConnectionString = require("../config/dbConfig");
 
-// MSSQL Connection String
-// const dbConnectionString =
-//   "workstation id=lifestyle.mssql.somee.com;packet size=4096;user id=adiitzkovich_SQLLogin_1;pwd=lnc8u82ax8;data source=lifestyle.mssql.somee.com;persist security info=False;initial catalog=lifestyle;TrustServerCertificate=True";
-
 //connect to the db
 const connectToDatabase = async () => {
   await sql.connect(dbConnectionString);

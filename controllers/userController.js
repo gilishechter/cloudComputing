@@ -8,6 +8,7 @@ exports.getLoginPage = (req, res) => {
   req.session.errorMessage = null;
   res.render("login", { errorMessage });
 };
+
 exports.getAboutPages = (req, res) => {
   const appName = "SugerWize";
   res.render("about", { appName });
@@ -21,7 +22,7 @@ exports.login = async (req, res) => {
     const users = await User.getUserByCredentials(username, password);
 
     if (users.length > 0) {
-      req.session.userId = users[0].UserId; // Adjust 'UserId' to match your column name
+      req.session.userId = users[0].UserId;
       await startkafkaConsumer(req, res);
 
       res.redirect("/users/dashboard");
@@ -78,7 +79,7 @@ exports.getDashboard = async (req, res) => {
       const user = await User.getUserById(req.session.userId);
 
       if (user) {
-        const notifications = []; // Add logic to retrieve notifications if necessary
+        const notifications = [];
         res.render("dashboard", { user, notifications });
       } else {
         res.redirect("/users/login"); // Redirect if no user found

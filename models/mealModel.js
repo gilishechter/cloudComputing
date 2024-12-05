@@ -6,10 +6,6 @@ const dbConnectionString = require("../config/dbConfig");
 
 const usdaApiKey = "HNqNjAecPRHVpqTPSiiVmJmw6RP1OEKNigeyGyBc";
 
-// MSSQL Connection String
-// const dbConnectionString =
-//   "workstation id=lifestyle.mssql.somee.com;packet size=4096;user id=adiitzkovich_SQLLogin_1;pwd=lnc8u82ax8;data source=lifestyle.mssql.somee.com;persist security info=False;initial catalog=lifestyle;TrustServerCertificate=True"; // Replace with your connection string
-
 //get the foos sugar from USDA
 async function getFoodSugarFromUSDA(foodName) {
   const urlA = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${usdaApiKey}&query=${foodName}`;
@@ -182,7 +178,7 @@ async function isFoodImage(imageFile) {
   };
 
   try {
-    const tags = await getTags(imageUrl); // השתמש ב-await כאן
+    const tags = await getTags(imageUrl);
     const foodTags = [
       "food",
       "meal",
@@ -216,53 +212,6 @@ async function isFoodImage(imageFile) {
       "waffle",
       "ice cream",
       "chocolate",
-      "noodles",
-      "tacos",
-      "burrito",
-      "curry",
-      "kebab",
-      "donut",
-      "pie",
-      "smoothie",
-      "juice",
-      "coffee",
-      "tea",
-      "beverage",
-      "yogurt",
-      "milk",
-      "sausage",
-      "hot dog",
-      "french fries",
-      "chips",
-      "popcorn",
-      "nuts",
-      "hummus",
-      "falafel",
-      "shawarma",
-      "quiche",
-      "lasagna",
-      "bagel",
-      "muffin",
-      "croissant",
-      "dumpling",
-      "ramen",
-      "cereal",
-      "oatmeal",
-      "tofu",
-      "avocado",
-      "guacamole",
-      "bbq",
-      "barbecue",
-      "grill",
-      "vegan",
-      "vegetarian",
-      "seafood",
-      "shellfish",
-      "lobster",
-      "crab",
-      "shrimp",
-      "squid",
-      "octopus",
     ];
 
     if (tags && tags.result && Array.isArray(tags.result.tags)) {
