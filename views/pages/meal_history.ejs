@@ -89,7 +89,7 @@
                 });
         });
 
-        const meals = <%- JSON.stringify(meals) %>;
+        const meals = JSON.parse('<%= meals %>');
         const dates = meals.map(meal => meal.meal_date.split("T")[0]);
         const bloodSugarLevels = meals.map(meal => meal.bloodSugar);
 
