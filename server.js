@@ -16,7 +16,7 @@ const io = socketIo(server);
 // Session Configuration
 app.use(
   session({
-    secret: "your_secret_key", // Change this to something unique
+    secret: "secret_key",
     resave: false,
     saveUninitialized: true,
   })

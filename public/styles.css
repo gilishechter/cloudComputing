@@ -857,6 +857,14 @@ button {
   position: relative;
 }
 
+.about-page nav .menu a {
+  margin-left: 20px;
+  color: #333;
+  text-decoration: none;
+  font-size: 18px;
+  transition: color 0.3s ease;
+  position: relative;
+}
 .meal-update-page nav .menu a:hover {
   color: #005bb5;
 }
@@ -952,7 +960,32 @@ button {
   padding: 20px;
 }
 
+.about-page {
+  font-family: "Roboto", sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  background: linear-gradient(to right, #f0f4f8, #e2e2e2);
+  color: #333;
+  padding: 20px;
+}
+
 .meal-history-page nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+}
+
+.about-page nav {
   position: fixed;
   top: 0;
   width: 100%;
@@ -972,6 +1005,15 @@ button {
 }
 
 .meal-history-page nav .menu a {
+  margin-left: 20px;
+  color: #333;
+  text-decoration: none;
+  font-size: 18px;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.about-page nav .menu a {
   margin-left: 20px;
   color: #333;
   text-decoration: none;
@@ -1109,11 +1151,11 @@ button {
 .meal-history-page .table-container {
   width: 100%;
   padding: 10px;
-} /* General Body Styling */
+}
 .about-page
 /* General Body Styling */
 body {
-  font-family: "Arial", sans-serif;
+  font-family: "Roboto", sans-serif;
   margin: 0;
   padding: 0;
   min-height: 100vh;
@@ -1137,58 +1179,37 @@ body {
     background-position: 0% 50%;
   }
 }
-.about-page
+
 /* Container Styling */
 .container {
   max-width: 1100px;
   margin: 40px auto;
   padding: 40px;
-  background-color: rgba(255, 255, 255, 0.9); /* רקע לבן שקוף */
+  background-color: rgba(255, 255, 255, 0.9);
   border-radius: 12px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
   text-align: center;
-  backdrop-filter: blur(10px); /* אפקט טשטוש */
+  backdrop-filter: blur(10px);
 }
-.about-page
+
 /* Section Styling */
 section {
   margin-bottom: 40px;
   padding: 30px;
-  background: rgba(230, 242, 255, 0.8); /* רקע שקוף */
+  background: rgba(230, 242, 255, 0.8);
   border-radius: 12px;
   position: relative;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(5px); /* אפקט טשטוש */
+  backdrop-filter: blur(5px);
   transition: transform 0.3s ease;
 }
-.about-page section:hover {
-  transform: scale(1.02);
-}
-/* .about-page
-Section Header
-section h2 {
-  font-size: 2.5rem;
-  color: #2e6bb8;
-  font-weight: bold;
-  margin-bottom: 20px;
-  text-shadow: 0px 5px 10px rgba(46, 107, 184, 0.5);
-  animation: fadeIn 1.5s ease;
-} */
 
-/* Fade In Animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+section:hover {
+  transform: scale(1.02);
 }
 
 /* Paragraph Styling */
-.about-page p {
+.about-page .container p {
   font-size: 1.2rem;
   line-height: 1.8;
   color: #333;
@@ -1235,7 +1256,7 @@ section h2 {
   transform: scale(1.02);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
 }
-.about-page
+
 /* List Styling */
 ul {
   list-style-type: none;
@@ -1250,19 +1271,28 @@ ul {
   color: #2e6bb8;
 }
 
-/* .about-page
-/* Footer Styling 
-footer {
-  background-color: #333;
-  color: #fff;
-  padding: 25px 0;
+.about-page header {
+  background-color: #007aff;
+  color: white;
+  padding: 40px;
   text-align: center;
-  font-size: 1.2rem;
-  border-top: 4px solid #4caf50;
+  font-size: 36px;
+  border-radius: 12px;
+  margin-bottom: 50px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
-.about-page footer a:hover {
-  text-decoration: underline;
-} */
+
+.about-page footer {
+  background-color: #007aff;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  font-size: 20px;
+  margin-top: auto;
+  width: 100%;
+}
 
 /* עיצוב כללי לתיבת ההודעות */
 #message-box {
